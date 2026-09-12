@@ -124,32 +124,33 @@
     // ---- 和值 ----
     const sumV = new Array(28).fill(0);
     rows.forEach(function (r) { sumV[r.sum]++; });
+    // 28 个和值 → SVG 宽约 998px，必须放进可横向滚动的容器，否则撑破整页
     C.clear(C.$('#fq-sum'));
-    C.$('#fq-sum').appendChild(barChart(
+    C.$('#fq-sum').appendChild(C.el('div', { class: 'chart-scroll' }, [barChart(
       sumV.map(function (_, i) { return String(i); }),
       sumV.map(function (v) { return v / L; }),
       T.sum.map(function (v) { return v / 1000; }),
-      '#2f6fd0', 'pct'));
+      '#2f6fd0', 'pct')]));
 
     // ---- 跨度 ----
     const spanV = new Array(10).fill(0);
     rows.forEach(function (r) { spanV[r.span]++; });
     C.clear(C.$('#fq-span'));
-    C.$('#fq-span').appendChild(barChart(
+    C.$('#fq-span').appendChild(C.el('div', { class: 'chart-scroll' }, [barChart(
       spanV.map(function (_, i) { return String(i); }),
       spanV.map(function (v) { return v / L; }),
       T.span.map(function (v) { return v / 1000; }),
-      '#b7791f', 'pct'));
+      '#b7791f', 'pct')]));
 
     // ---- 组态 ----
     const typeV = { '豹子': 0, '组三': 0, '组六': 0 };
     rows.forEach(function (r) { typeV[r.type]++; });
     const names = ['豹子', '组三', '组六'];
     C.clear(C.$('#fq-repeat'));
-    C.$('#fq-repeat').appendChild(barChart(
+    C.$('#fq-repeat').appendChild(C.el('div', { class: 'chart-scroll' }, [barChart(
       names, names.map(function (n) { return typeV[n] / L; }),
       names.map(function (n) { return T.type[n] / 1000; }),
-      '#2f855a', 'pct'));
+      '#2f855a', 'pct')]));
 
     C.$('#fq-repeat').appendChild(C.el('div', { class: 'legend' }, [
       C.el('div', {}, [
