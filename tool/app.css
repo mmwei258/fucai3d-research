@@ -325,6 +325,12 @@ footer.end {
 .empty { color: var(--ink-3); font-size: 13px; padding: 18px 0; text-align: center; }
 
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* 关键：grid / flex 子项默认 min-width:auto，不会收缩到内容固有宽度以下。
+   占位率分布图宽 998px，会把整张卡片撑开、进而撑破页面——
+   必须显式允许收缩，内部的 .chart-scroll 才能生效。 */
+.grid2 > *, .stats > * { min-width: 0; }
+
 @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } }
 
 /* 表格横向滚动容器：手机上表格列多，容器内滑动，不撑破页面 */
