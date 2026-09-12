@@ -1,7 +1,8 @@
-/* ================= 选号器 ================= */
+/* ================= 选号器（含筛选条件） ================= */
 (function () {
   'use strict';
   const C = window.CORE;
+  const D = C.DRAWS;
   const POS_NAME = ['第一位', '第二位', '第三位'];
 
   // 福彩3D 直选固定奖金 1040 元 / 注，每注 2 元
@@ -9,42 +10,89 @@
 
   const posSel = [new Set(), new Set(), new Set()];
   const grpSel = new Set();
+  const danSel = new Set();
+  const f = {
+    sumMin: '', sumMax: '', spanMin: '', spanMax: '', gapMin: '', gapMax: '',
+    bs: new Set(), oe: new Set()
+  };
   let wired = false;
 
-  function digitPad(selected, onToggle) {
-    const wrap = C.el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' });
-    for (let d = 0; d <= 9; d++) {
-      const on = selected.has(d);
-      wrap.appendChild(C.el('button', {
-        class: 'digit-btn' + (on ? ' on' : ''),
-        text: String(d),
-        onclick: (function (digit) {
-          return function () {
-            if (selected.has(digit)) selected.delete(digit); else selected.add(digit);
-            onToggle();
-          };
-        })(d)
-      }));
-    }
-    return wrap;
+  // 每个号码（000~999）的"当前遗漏"：距离它上次开出过了多少期
+  const GAP = (function () {
+    const last = new Array(1000).fill(-1);
+    D.forEach(function (r, i) { last[+r.number] = i; });
+    const n = D.length;
+    return last.map(function (i) { return i < 0 ? n : n - 1 - i; });
+  })();
+
+  // ---------- 筛选逻辑 ----------
+  const NUM = [];
+  for (let i = 0; i < 1000; i++) NUM.push(('00' + i).slice(-3));
+
+  function bigSmallRatio(num) {
+    const big = (num[0] >= '5' ? 1 : 0) + (num[1] >= '5' ? 1 : 0) + (num[2] >= '5' ? 1 : 0);
+    return big + ':' + (3 - big);
   }
 
+  function oddEvenRatio(num) {
+    const odd = (+num[0] % 2) + (+num[1] % 2) + (+num[2] % 2);
+    return odd + ':' + (3 - odd);
+  }
+
+  function sumOf(num) { return +num[0] + +num[1] + +num[2]; }
+
+  function spanOf(num) {
+    const a = +num[0], b = +num[1], c = +num[2];
+    return Math.max(a, b, c) - Math.min(a, b, c);
+  }
+
+  function hasAnyFilter() {
+    return f.sumMin !== '' || f.sumMax !== '' || f.spanMin !== '' || f.spanMax !== ''
+        || f.gapMin !== '' || f.gapMax !== ''
+        || f.bs.size > 0 || f.oe.size > 0 || danSel.size > 0;
+  }
+
+  function passes(num) {
+    if (f.sumMin !== '' && sumOf(num) < +f.sumMin) return false;
+    if (f.sumMax !== '' && sumOf(num) > +f.sumMax) return false;
+    if (f.spanMin !== '' && spanOf(num) < +f.spanMin) return false;
+    if (f.spanMax !== '' && spanOf(num) > +f.spanMax) return false;
+    if (f.bs.size && !f.bs.has(bigSmallRatio(num))) return false;
+    if (f.oe.size && !f.oe.has(oddEvenRatio(num))) return false;
+    if (danSel.size) {
+      const ds = Array.from(danSel);
+      for (let i = 0; i < ds.length; i++) {
+        if (num.indexOf(String(ds[i])) < 0) return false;
+      }
+    }
+    if (f.gapMin !== '' && GAP[+num] < +f.gapMin) return false;
+    if (f.gapMax !== '' && GAP[+num] > +f.gapMax) return false;
+    return true;
+  }
+
+  // ---------- 选号 ----------
   function recentNumbers() {
     const n = C.$('#pk-exclude-recent').checked ? 30 : 0;
     const s = new Set();
-    C.sliceWindow(C.DRAWS, n).forEach(function (r) { s.add(r.number); });
+    C.sliceWindow(D, n).forEach(function (r) { s.add(r.number); });
     return s;
   }
 
-  function directList() {
-    const recent = recentNumbers();
+  function posDigitsSelected() {
+    return posSel[0].size + posSel[1].size + posSel[2].size;
+  }
+
+  // 直选基础池：按位选号的笛卡尔积；若未选数字但有筛选条件，则取全部 1000 种
+  function baseDirect() {
+    const digitsChosen = posDigitsSelected() > 0;
+    if (!digitsChosen) {
+      if (hasAnyFilter()) return NUM.slice();
+      return [];
+    }
     const out = [];
     posSel[0].forEach(function (a) {
       posSel[1].forEach(function (b) {
-        posSel[2].forEach(function (c) {
-          const num = '' + a + b + c;
-          if (!recent.has(num)) out.push(num);
-        });
+        posSel[2].forEach(function (c) { out.push('' + a + b + c); });
       });
     });
     return out;
@@ -68,7 +116,113 @@
 
   function money(x) { return C.comma(Math.round(x)) + ' 元'; }
 
-  // 重建按钮区，保证点击后立即看到选中态
+  // ---------- 界面构建 ----------
+  function digitPad(selected, onToggle, cls) {
+    const wrap = C.el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' });
+    for (let d = 0; d <= 9; d++) {
+      const on = selected.has(d);
+      wrap.appendChild(C.el('button', {
+        class: (cls || 'digit-btn') + (on ? ' on' : ''),
+        text: String(d),
+        onclick: (function (digit) {
+          return function () {
+            if (selected.has(digit)) selected.delete(digit); else selected.add(digit);
+            onToggle();
+          };
+        })(d)
+      }));
+    }
+    return wrap;
+  }
+
+  function numInput(key, ph, min, max) {
+    return C.el('input', {
+      type: 'number', value: f[key], placeholder: ph || '',
+      min: String(min), max: String(max),
+      oninput: function (e) {
+        f[key] = e.target.value;
+        refresh();
+      }
+    });
+  }
+
+  function ratioRow(values, set) {
+    const row = C.el('div', { class: 'chip-row' });
+    values.forEach(function (v) {
+      row.appendChild(C.el('button', {
+        class: 'chip-btn' + (set.has(v) ? ' on' : ''),
+        text: v,
+        onclick: function () {
+          if (set.has(v)) set.delete(v); else set.add(v);
+          refresh();
+        }
+      }));
+    });
+    return row;
+  }
+
+  function buildFilters() {
+    const box = C.$('#pk-filters');
+    C.clear(box);
+    const grid = C.el('div', { class: 'filter-grid' });
+
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
+      C.el('span', { class: 'fl', text: '和值' }),
+      numInput('sumMin', '最小', 0, 27),
+      C.el('span', { class: 'sep', text: '~' }),
+      numInput('sumMax', '最大', 0, 27)
+    ]));
+
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
+      C.el('span', { class: 'fl', text: '跨度' }),
+      numInput('spanMin', '最小', 0, 9),
+      C.el('span', { class: 'sep', text: '~' }),
+      numInput('spanMax', '最大', 0, 9)
+    ]));
+
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
+      C.el('span', { class: 'fl', text: '号码遗漏' }),
+      numInput('gapMin', '最小', 0, 9999),
+      C.el('span', { class: 'sep', text: '~' }),
+      numInput('gapMax', '最大', 0, 9999),
+      C.el('span', { class: 'sep', text: '期' })
+    ]));
+
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
+      C.el('span', { class: 'fl', text: '大小比' }),
+      ratioRow(['3:0', '2:1', '1:2', '0:3'], f.bs)
+    ]));
+
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
+      C.el('span', { class: 'fl', text: '奇偶比' }),
+      ratioRow(['3:0', '2:1', '1:2', '0:3'], f.oe)
+    ]));
+
+    box.appendChild(grid);
+
+    box.appendChild(C.el('div', { class: 'filter-item', style: 'margin-top:12px' }, [
+      C.el('span', { class: 'fl', text: '胆码' }),
+      digitPad(danSel, refresh, 'chip-btn'),
+      C.el('span', {
+        style: 'color:var(--ink-3);font-size:12px',
+        text: '（号码必须包含选中的每一个数字）'
+      })
+    ]));
+
+    if (hasAnyFilter()) {
+      box.appendChild(C.el('div', { style: 'margin-top:10px' }, [
+        C.el('button', {
+          class: 'btn ghost', text: '重置筛选',
+          onclick: function () {
+            f.sumMin = f.sumMax = f.spanMin = f.spanMax = f.gapMin = f.gapMax = '';
+            f.bs.clear(); f.oe.clear(); danSel.clear();
+            refresh();
+          }
+        })
+      ]));
+    }
+  }
+
   function buildPads() {
     const posBox = C.$('#pk-pos');
     C.clear(posBox);
@@ -93,17 +247,24 @@
 
   function refresh() {
     buildPads();
+    buildFilters();
     calc();
   }
 
+  // ---------- 计算与结果 ----------
   function calc() {
-    const direct = directList();
+    const pool = baseDirect();
+    const recent = recentNumbers();
+    const poolNoRecent = pool.filter(function (n) { return !recent.has(n); });
+    const direct = poolNoRecent.filter(passes);
+
     const grp = groupLists();
-    const nDirect = direct.length;
-    const n6 = grp.g6.length, n3 = grp.g3.length;
+    const g6 = grp.g6.filter(passes);
+    const g3 = grp.g3.filter(passes);
+
+    const nDirect = direct.length, n6 = g6.length, n3 = g3.length;
     const totalBets = nDirect + n6 + n3;
     const cost = totalBets * BET;
-
     const evDirect = nDirect * (1 / 1000) * PRIZE_DIRECT;
     const ev6 = n6 * (6 / 1000) * PRIZE_G6;
     const ev3 = n3 * (3 / 1000) * PRIZE_G3;
@@ -112,8 +273,8 @@
     const box = C.$('#pk-result');
     C.clear(box);
 
-    // ---- 未产生任何有效注数：给出可执行的引导，而不是一片空白 ----
-    if (totalBets === 0) {
+    // ---- 什么都没选：给出可执行引导 ----
+    if (totalBets === 0 && !hasAnyFilter()) {
       const missing = [];
       for (let p = 0; p < 3; p++) if (posSel[p].size === 0) missing.push(POS_NAME[p]);
       const lines = [];
@@ -121,12 +282,12 @@
         lines.push('还没有选号。点上面的数字按钮开始选择。');
         lines.push('玩法一：直选需要在「第一位 / 第二位 / 第三位」各选至少 1 个数字。');
         lines.push('玩法二：组选只需在下方选出数字，自动展开为组选六 / 组选三。');
+        lines.push('玩法三：不选数字，直接用「筛选条件」圈定范围（如和值 13~14）。');
       } else {
         if (missing.length) {
           lines.push('直选还缺：' + missing.join('、') +
                      '（三个位置各选至少 1 个数字才能组成号码）。');
         } else if (nDirect === 0) {
-          // 点名被过滤掉的具体号码，避免用户对着空白猜原因
           const unfiltered = [];
           posSel[0].forEach(function (a) {
             posSel[1].forEach(function (b) {
@@ -145,10 +306,7 @@
       }
       const info = C.el('div', { class: 'note' });
       lines.forEach(function (t, i) {
-        info.appendChild(C.el('div', {
-          style: i ? 'margin-top:6px' : '',
-          text: t
-        }));
+        info.appendChild(C.el('div', { style: i ? 'margin-top:6px' : '', text: t }));
       });
       box.appendChild(info);
       return;
@@ -170,32 +328,25 @@
     stat('长期期望净亏', money(evTotal - cost));
     box.appendChild(stats);
 
-    // ---- 排除规则的实际影响必须明示，否则用户不知道为什么少了几注 ----
-    const fullProduct = posSel[0].size * posSel[1].size * posSel[2].size;
-    const excluded = fullProduct - nDirect;
-    if (posSel[0].size && posSel[1].size && posSel[2].size && excluded > 0) {
-      const recent = recentNumbers();
-      const dropped = [];
-      posSel[0].forEach(function (a) {
-        posSel[1].forEach(function (b) {
-          posSel[2].forEach(function (c) {
-            const num = '' + a + b + c;
-            if (recent.has(num)) dropped.push(num);
-          });
-        });
+    // ---- 筛选了多少，必须自己交代清楚 ----
+    const notes = [];
+    if (poolNoRecent.length !== pool.length) {
+      notes.push('「排除最近 30 期已开出」剔除了 ' + (pool.length - poolNoRecent.length) + ' 个号码。');
+    }
+    if (hasAnyFilter() && poolNoRecent.length !== nDirect) {
+      notes.push('筛选条件从 ' + poolNoRecent.length + ' 个直选号码中保留了 ' +
+                 nDirect + ' 个，剔除 ' + (poolNoRecent.length - nDirect) + ' 个。');
+    }
+    if (posDigitsSelected() === 0 && pool.length === 1000) {
+      notes.push('未指定具体数字，基数是全部 1000 种组合，因此注数较大——' +
+                 '请用筛选条件继续收窄。');
+    }
+    if (notes.length) {
+      const nb = C.el('div', { class: 'note' });
+      notes.forEach(function (t, i) {
+        nb.appendChild(C.el('div', { style: i ? 'margin-top:5px' : '', text: t }));
       });
-      box.appendChild(C.el('div', { class: 'note' }, [
-        C.el('div', {
-          html: '直选理论组合 <b>' + fullProduct + '</b> 注，按「排除最近 30 期已开出」规则' +
-                '剔除 <b>' + excluded + '</b> 注，实际 <b>' + nDirect + '</b> 注。'
-        }),
-        C.el('div', {
-          style: 'margin-top:5px',
-          text: '被剔除：' + dropped.slice(0, 20).join('、') +
-                (dropped.length > 20 ? ' …' : '') +
-                '（取消勾选即可包含它们）'
-        })
-      ]));
+      box.appendChild(nb);
     }
 
     const detail = C.el('table', { style: 'margin-top:14px' });
@@ -225,23 +376,28 @@
     detail.appendChild(tb);
     box.appendChild(C.tableScroll(detail));
 
-    const all = direct.concat(grp.g6, grp.g3);
+    const all = direct.concat(g6, g3);
     box.appendChild(C.el('h3', { text: '覆盖号码（前 60 个，共 ' + all.length + ' 个）' }));
-    const preview = C.el('div', {
-      style: 'display:flex;flex-wrap:wrap;gap:6px'
-    });
+    const preview = C.el('div', { style: 'display:flex;flex-wrap:wrap;gap:6px' });
     all.slice(0, 60).forEach(function (x) {
       preview.appendChild(C.el('span', { class: 'tag gray', text: x }));
     });
     if (all.length > 60) preview.appendChild(C.el('span', { text: '…' }));
     box.appendChild(preview);
 
+    // ---- 核心：把"过滤不等于省钱"讲明白 ----
     box.appendChild(C.el('div', { class: 'note warn' }, [
       C.el('div', {
-        html: '<b>请注意这个数字：无论你买 1 注还是 1000 注，期望回报率恒为 52%。</b>' +
-              '因为直选奖金 1040 元 ÷（2 元 × 1000 种组合）= 52%。' +
-              '覆盖面越广，中奖概率越高，但投入同比例上升——期望值不变。' +
-              '上面的「长期期望净亏」为负，是规则决定的，与选号方式无关。'
+        html: '<b>筛选不会提高回报率，也不会让你"省钱"。</b>' +
+              '筛选只是把投注范围从 ' + poolNoRecent.length + ' 注缩到 ' + nDirect +
+              ' 注：花费按比例减少，<b>中奖概率也按同样的比例减少</b>，两者相抵。'
+      }),
+      C.el('div', {
+        style: 'margin-top:6px',
+        html: '直选奖金 1040 元 ÷（2 元 × 1000 种组合）= <b>52%</b>，' +
+              '这是彩票规则决定的，与你选多少注、怎么筛都无关。' +
+              '上面「期望回报率」恒为 52%，「长期期望净亏」恒为负——' +
+              '少买只是少亏，不是不亏。'
       })
     ]));
   }
@@ -252,6 +408,9 @@
       C.$('#pk-clear').addEventListener('click', function () {
         posSel.forEach(function (s) { s.clear(); });
         grpSel.clear();
+        danSel.clear();
+        f.sumMin = f.sumMax = f.spanMin = f.spanMax = f.gapMin = f.gapMax = '';
+        f.bs.clear(); f.oe.clear();
         refresh();
       });
       C.$('#pk-exclude-recent').addEventListener('change', calc);
@@ -260,5 +419,9 @@
     refresh();
   }
 
-  window.PICKER = { render: render, _state: { posSel: posSel, grpSel: grpSel } };
+  window.PICKER = {
+    render: render,
+    _state: { posSel: posSel, grpSel: grpSel, danSel: danSel, filters: f },
+    _passes: passes
+  };
 })();

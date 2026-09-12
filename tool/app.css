@@ -204,6 +204,63 @@ label.chk {
   cursor: pointer;
 }
 
+/* ---------- 筛选条件区 ---------- */
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+  gap: 10px 18px;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  flex-wrap: wrap;
+}
+
+.filter-item > .fl {
+  min-width: 58px;
+  color: var(--ink-2);
+}
+
+.filter-item input[type="number"] {
+  width: 58px;
+  padding: 5px 7px;
+  font-size: 12.5px;
+}
+
+.filter-item .sep { color: var(--ink-3); }
+
+/* 小号开关（大小比 / 奇偶比 / 胆码） */
+.chip-btn {
+  min-width: 36px;
+  padding: 5px 8px;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: linear-gradient(180deg, #ffffff, #f1f5fa);
+  border: 1px solid #d3dce9;
+  border-radius: 6px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 0 #d3dce9;
+  transition: background .12s ease, box-shadow .12s ease, transform .08s ease;
+}
+
+.chip-btn:hover { background: linear-gradient(180deg, #ffffff, #e6eefb); }
+.chip-btn:active { transform: translateY(1px); box-shadow: inset 0 1px 3px rgba(28, 36, 48, .18); }
+
+.chip-btn.on {
+  color: #fff;
+  background: linear-gradient(180deg, #4a8ae6, #2f6fd0);
+  border-color: #22549c;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 1px 0 #1d4a8c;
+}
+
+.chip-row { display: flex; gap: 5px; flex-wrap: wrap; }
+
 /* ---------- 统计块 ---------- */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
