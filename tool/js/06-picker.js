@@ -376,21 +376,37 @@
     detail.appendChild(tb);
     box.appendChild(C.tableScroll(detail));
 
+    // ---- 覆盖号码：全部列出（上限 200，超过则标注剩余数量）----
+    const CAP = 200;
     const all = direct.concat(g6, g3);
-    box.appendChild(C.el('h3', { text: '覆盖号码（前 60 个，共 ' + all.length + ' 个）' }));
-    const preview = C.el('div', { style: 'display:flex;flex-wrap:wrap;gap:6px' });
-    all.slice(0, 60).forEach(function (x) {
-      preview.appendChild(C.el('span', { class: 'tag gray', text: x }));
+    box.appendChild(C.el('h3', {
+      text: '覆盖号码（共 ' + all.length + ' 个' +
+            (all.length > CAP ? '，下列前 ' + CAP + ' 个' : '') + '）'
+    }));
+    const list = C.el('div', { class: 'num-list' });
+    all.slice(0, CAP).forEach(function (x) {
+      list.appendChild(C.el('span', { class: 'num-chip', text: x }));
     });
-    if (all.length > 60) preview.appendChild(C.el('span', { text: '…' }));
-    box.appendChild(preview);
+    if (all.length > CAP) {
+      list.appendChild(C.el('span', {
+        class: 'num-chip more', text: '还有 ' + (all.length - CAP) + ' 个'
+      }));
+    }
+    box.appendChild(list);
 
     // ---- 核心：把"过滤不等于省钱"讲明白 ----
+    // 只有真的剔除了号码才说"缩小范围"，否则会出现"从 18 注缩到 18 注"这种废话
+    const narrowed = poolNoRecent.length > nDirect;
+    const removedByFilter = poolNoRecent.length - nDirect;
     box.appendChild(C.el('div', { class: 'note warn' }, [
       C.el('div', {
         html: '<b>筛选不会提高回报率，也不会让你"省钱"。</b>' +
-              '筛选只是把投注范围从 ' + poolNoRecent.length + ' 注缩到 ' + nDirect +
-              ' 注：花费按比例减少，<b>中奖概率也按同样的比例减少</b>，两者相抵。'
+              (narrowed
+                ? '筛选只是把投注范围从 ' + poolNoRecent.length + ' 注缩到 ' + nDirect +
+                  ' 注（剔除 ' + removedByFilter + ' 注）：花费按比例减少，' +
+                  '<b>中奖概率也按同样的比例减少</b>，两者相抵。'
+                : '当前筛选条件没有剔除任何号码。无论范围多大，' +
+                  '花费与中奖概率都按同比例变化，两者相抵。')
       }),
       C.el('div', {
         style: 'margin-top:6px',
