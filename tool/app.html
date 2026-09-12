@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>福彩3D 数据工具箱 · 历史统计与策略回测</title>
+<style>
+/*__CSS__*/
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div class="brand-row">
+      <h1>福彩3D 数据工具箱</h1>
+      <span class="sub">历史统计 · 遗漏分析 · 策略回测</span>
+    </div>
+    <div class="station">
+      <span class="station-name">AAAAAAA 22</span>
+      <span class="station-sub">22年双彩店</span>
+      <span class="station-gap"></span>
+      <span class="station-no">体彩站点 4301001209</span>
+      <span class="station-no">福彩站点 43019622</span>
+    </div>
+    <div class="disclaimer">
+      <b>本工具只做历史数据的统计呈现，不做任何号码预测，也不构成投注建议。</b>
+      彩票每期独立随机，历史数据对未来结果没有预测力；官方返奖率约 52%，
+      长期参与的数学期望为负。请理性娱乐、量力而行。
+    </div>
+    <nav class="tabs" id="tabs"></nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ========== 概览 ========== -->
+  <section class="panel" id="p-overview">
+    <div class="card">
+      <h2>数据概览</h2>
+      <p class="hint" id="ov-range"></p>
+      <div class="stats" id="ov-stats"></div>
+      <div class="note" id="ov-note"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>最近 10 期开奖</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr>
+              <th>期号</th><th>日期</th><th>号码</th><th>和值</th><th>跨度</th><th>组态</th>
+            </tr></thead>
+            <tbody id="ov-latest"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <h2>结构分布（全历史）</h2>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>项目</th><th>实际占比</th><th>理论值</th></tr></thead>
+            <tbody id="ov-struct"></tbody>
+          </table>
+        </div>
+        <div class="note">
+          「理论值」按 000~999 共 1000 种等概率组合精确计算。
+          实际占比与理论值越接近，说明数据越接近均匀随机。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 走势图 ========== -->
+  <section class="panel hidden" id="p-trend">
+    <div class="card">
+      <h2>号码走势</h2>
+      <p class="hint">滚轮横向滚动查看更早期数。</p>
+      <div class="row">
+        <label>显示期数
+          <select id="tr-n">
+            <option value="30">最近 30 期</option>
+            <option value="50" selected>最近 50 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="200">最近 200 期</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="tr-line" checked> 显示连线</label>
+      </div>
+      <div class="chart-scroll" id="tr-chart"></div>
+      <div class="legend" id="tr-legend"></div>
+    </div>
+
+    <div class="card">
+      <h2>和值与跨度走势</h2>
+      <div class="chart-scroll" id="tr-sum"></div>
+      <div class="chart-scroll" id="tr-span" style="margin-top:12px"></div>
+    </div>
+  </section>
+
+  <!-- ========== 遗漏 ========== -->
+  <section class="panel hidden" id="p-omission">
+    <div class="card">
+      <h2>遗漏统计</h2>
+      <p class="hint">
+        遗漏 = 距离该数字上次出现在该位置，已过了多少期。
+        <b>遗漏值不代表"该出了"</b>——每期都是独立事件，这是统计描述，不是预测信号。
+      </p>
+      <div class="row">
+        <label>统计窗口
+          <select id="om-window">
+            <option value="0">全历史</option>
+            <option value="360" selected>最近 360 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="30">最近 30 期</option>
+          </select>
+        </label>
+        <button class="btn ghost" id="om-sort">按当前遗漏排序</button>
+      </div>
+      <div id="om-tables" style="margin-top:14px"></div>
+    </div>
+  </section>
+
+  <!-- ========== 频率分布 ========== -->
+  <section class="panel hidden" id="p-freq">
+    <div class="card">
+      <h2>数字频率（多窗口对比）</h2>
+      <p class="hint">同一批数字在不同时间窗口下的出现频率。口径透明，可自行核查。</p>
+      <div class="row">
+        <label>窗口
+          <select id="fq-window">
+            <option value="30">最近 30 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="360" selected>最近 360 期</option>
+            <option value="0">全历史</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="fq-cmp" checked> 与理论均匀分布对比</label>
+      </div>
+      <div id="fq-digits" style="margin-top:14px"></div>
+    </div>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>和值分布</h2>
+        <p class="hint">0~27 共 28 种取值。</p>
+        <div id="fq-sum"></div>
+      </div>
+      <div class="card">
+        <h2>跨度分布</h2>
+        <p class="hint">0~9 共 10 种取值。</p>
+        <div id="fq-span"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>组态分布（豹子 / 组三 / 组六）</h2>
+      <div id="fq-repeat"></div>
+    </div>
+  </section>
+
+  <!-- ========== 选号器 ========== -->
+  <section class="panel hidden" id="p-picker">
+    <div class="card">
+      <h2>选号器 · 覆盖与成本计算</h2>
+      <p class="hint">
+        选定号码后，这里只做一件事：<b>算清楚你覆盖了多少种组合、花了多少钱、
+        长期期望能拿回多少</b>。不做推荐，不判断"好不好"。
+      </p>
+
+      <h3>按位选号（直选复式）</h3>
+      <div id="pk-pos"></div>
+
+      <h3>组选选号（不计顺序）</h3>
+      <div id="pk-group"></div>
+
+      <div class="row" style="margin-top:16px">
+        <button class="btn" id="pk-calc">计算</button>
+        <button class="btn ghost" id="pk-clear">清空</button>
+        <label class="chk"><input type="checkbox" id="pk-exclude-recent" checked>
+          排除最近 30 期已开出的号码</label>
+      </div>
+
+      <div id="pk-result" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+  <!-- ========== 回测实验室 ========== -->
+  <section class="panel hidden" id="p-backtest">
+    <div class="card">
+      <h2>策略回测实验室</h2>
+      <p class="hint">
+        选一种策略，在真实历史数据上做<b>严格样本外</b>检验：预测第 N 期时只用第 N 期之前的数据。
+        结果会与"纯随机"的理论基线并列展示。
+      </p>
+      <div class="row">
+        <label>策略
+          <select id="bt-strategy">
+            <option value="random">纯随机（对照）</option>
+            <option value="hot">热号优先（近 360 期高频数字）</option>
+            <option value="cold">冷号优先（近 360 期低频数字）</option>
+            <option value="gap">遗漏值法（押"很久没出"的数字）</option>
+            <option value="markov">马尔可夫链（上期该位数字 → 本期条件概率）</option>
+          </select>
+        </label>
+        <label>回测期数
+          <select id="bt-n">
+            <option value="200">200 期</option>
+            <option value="500" selected>500 期</option>
+            <option value="1000">1000 期</option>
+          </select>
+        </label>
+        <button class="btn" id="bt-run">开始回测</button>
+      </div>
+      <div id="bt-result" style="margin-top:16px"></div>
+    </div>
+
+    <div class="card">
+      <h2>为什么结果永远"接近基线"？</h2>
+      <p class="hint">
+        下方是纯随机策略的实测结果——它和理论基线几乎完全重合，说明测量是准的。
+        任何"聪明策略"如果打不破这条线，就说明它没有真实优势。
+      </p>
+      <div id="bt-baseline"></div>
+      <div class="note warn">
+        我们已经用 1000 期样本外数据检验过热号、冷号、遗漏、马尔可夫、朴素贝叶斯、
+        KNN、梯度提升树与管理方法组合——<b>没有任何一种能稳定超过随机基线</b>。
+        这是随机数据的必然结果，不是策略不够聪明。
+      </div>
+    </div>
+  </section>
+
+  <footer class="end">
+    数据来源：中国福彩网官方接口 · 本页所有数值均可由原始开奖数据复算核验<br>
+    仅用于数据工程与统计方法研究 · 不构成任何投注建议
+  </footer>
+</div>
+
+<script>
+/*__DATA__*/
+</script>
+<script>
+/*__JS__*/
+</script>
+</body>
+</html>
