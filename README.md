@@ -1,9 +1,9 @@
 # fucai3d-research
 
-[![License](https://img.shields.io/github/license/Aioneas/fucai3d-research)](./LICENSE)
-[![Repo Size](https://img.shields.io/github/repo-size/Aioneas/fucai3d-research)](https://github.com/Aioneas/fucai3d-research)
-[![Last Commit](https://img.shields.io/github/last-commit/Aioneas/fucai3d-research)](https://github.com/Aioneas/fucai3d-research/commits/main)
-[![Stars](https://img.shields.io/github/stars/Aioneas/fucai3d-research?style=social)](https://github.com/Aioneas/fucai3d-research)
+[![License](https://img.shields.io/github/license/mmwei258/fucai3d-research)](./LICENSE)
+[![Repo Size](https://img.shields.io/github/repo-size/mmwei258/fucai3d-research)](https://github.com/mmwei258/fucai3d-research)
+[![Last Commit](https://img.shields.io/github/last-commit/mmwei258/fucai3d-research)](https://github.com/mmwei258/fucai3d-research/commits/main)
+[![Stars](https://img.shields.io/github/stars/mmwei258/fucai3d-research?style=social)](https://github.com/mmwei258/fucai3d-research)
 
 > 中国福利彩票 3D（福彩3D）历史数据工程、特征构建、walk-forward 回测、娱乐性推荐与 skill 封装项目。
 
