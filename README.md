@@ -89,10 +89,18 @@
 | [`history_official_all_summary.json`](./data/all/history_official_all_summary.json) | 全历史数据摘要 |
 
 ### 3) 原始抓取转储（`data/raw/`）
-用于复盘 browser 会话抓取过程：
+官方接口返回的原始转储（格式与 browser 会话导出一致，可被构建脚本直接解析）：
 - [`official_api_2y_browser_dump.txt`](./data/raw/official_api_2y_browser_dump.txt)
 - [`official_api_all_browser_dump.txt`](./data/raw/official_api_all_browser_dump.txt)
 - [`fetch_config_2y.json`](./data/raw/fetch_config_2y.json)
+
+刷新方式（需联网，会覆盖上面两个 dump；写盘前会用解析器自检，失败则拒绝写入）：
+
+```bash
+python3 scripts/fetch_official_dump.py             # 更新 all + 2y
+python3 scripts/fetch_official_dump.py --mode all  # 只更新全历史
+python3 scripts/fetch_official_dump.py --dry-run   # 只抓取与自检，不写文件
+```
 
 ---
 
@@ -112,7 +120,7 @@
 
 ```mermaid
 flowchart TD
-    A[中国福彩网官方接口] --> B[browser会话抓取]
+    A[中国福彩网官方接口] --> B[fetch_official_dump.py 抓取]
     B --> C[原始结构化转储]
     C --> D[历史数据解析与去重]
     D --> E[2Y数据集构建]
@@ -132,18 +140,25 @@ flowchart TD
 > 环境：Python 3（脚本主要使用标准库）
 
 ```bash
+# 0) 刷新官方数据转储（可选；联网更新 data/raw/，再用后续步骤重建派生数据）
+python3 scripts/fetch_official_dump.py
+
 # 1) 两年数据构建
 python3 scripts/build_fucai3d_dataset.py
 
 # 2) 全历史数据构建
 python3 scripts/build_fucai3d_all_dataset.py
 
-# 3) walk-forward 回测
+# 3) walk-forward 回测（选出 window / half_life）
 python3 scripts/fucai3d_backtest_walkforward.py
 
-# 4) 未来7天娱乐推荐
+# 4) 未来7天娱乐推荐（自动继承第 3 步选出的参数）
 python3 scripts/fucai3d_forecast_next7days.py
 ```
+
+Windows 下也可直接双击仓库根目录的 [`一键运行.bat`](./一键运行.bat) 依次执行上述第 1~4 步。
+
+> 顺序有依赖：第 4 步从第 3 步的报告中读取 `selected_config`，请勿跳过回测直接跑预测。
 
 ---
 
@@ -156,7 +171,7 @@ fucai3d-research/
 │   ├── 2y/        # 两年数据/特征/摘要
 │   └── all/       # 全历史数据/特征/摘要
 ├── reports/       # 回测结果与推荐输出
-├── scripts/       # 构建、回测、推荐脚本
+├── scripts/       # 抓取、构建、回测、推荐脚本
 ├── skill/         # Minis skill 封装
 ├── docs/          # 免责声明等文档
 ├── LICENSE
