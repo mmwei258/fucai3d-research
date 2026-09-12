@@ -141,7 +141,7 @@
         onclick: function () { show(t.id); }
       }));
     });
-    show('overview');
+    show('picker');        // 打开页面直接进选号器
   }
 
   // ---------- 导出到全局 ----------
