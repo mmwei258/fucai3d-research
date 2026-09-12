@@ -3,18 +3,18 @@
   "endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
   "lottery": "福彩3D",
   "range": {
-    "dayStart": "2024-04-13",
-    "dayEnd": "2026-04-13"
+    "dayStart": "2024-09-12",
+    "dayEnd": "2026-09-12"
   },
-  "total_records": 702,
-  "first_issue": "2024094",
-  "last_issue": "2026092",
-  "first_date": "2024-04-13",
-  "last_date": "2026-04-12",
-  "train_history_path": "/var/minis/shared/fucai3d/history.json",
-  "full_history_path": "/var/minis/shared/fucai3d/history_official_2y_full.json",
-  "features_path": "/var/minis/shared/fucai3d/history_official_2y_features.json",
-  "features_csv_path": "/var/minis/shared/fucai3d/history_official_2y_features.csv",
-  "jsonl_path": "/var/minis/shared/fucai3d/history_official_2y_full.jsonl",
+  "total_records": 703,
+  "first_issue": "2024246",
+  "last_issue": "2026245",
+  "first_date": "2024-09-12",
+  "last_date": "2026-09-12",
+  "train_history_path": "D:\\fucai3d-research\\data\\2y\\history.json",
+  "full_history_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_full.json",
+  "features_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_features.json",
+  "features_csv_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_features.csv",
+  "jsonl_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_full.jsonl",
   "feature_columns": 86
 }

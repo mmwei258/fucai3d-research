@@ -12,7 +12,31 @@ OUT_DIR = Path(os.environ.get('FUCAI3D_REPORTS_DIR', str(ROOT / 'reports')))
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 OUT_JSON = OUT_DIR / 'forecast_next7days_entertainment.json'
 OUT_MD = OUT_DIR / 'forecast_next7days_entertainment.md'
-CFG = {'window': 360, 'half_life': 120}
+SUMMARY_PATH = OUT_DIR / 'backtest_walkforward_summary.json'
+DEFAULT_CFG = {'window': 360, 'half_life': 120}
+
+
+def load_selected_config():
+    """取回测选出的参数，保证预测与 walk-forward 回测口径一致。
+
+    回测报告缺失或格式异常时回退到 DEFAULT_CFG，并如实标注来源，
+    避免再次出现"预测用一套参数、回测用另一套"的脱节。
+    """
+    try:
+        if SUMMARY_PATH.exists():
+            data = json.loads(SUMMARY_PATH.read_text(encoding='utf-8'))
+            cfg = data.get('selected_config') or {}
+            if 'window' in cfg and 'half_life' in cfg:
+                return (
+                    {'window': int(cfg['window']), 'half_life': int(cfg['half_life'])},
+                    SUMMARY_PATH.name,
+                )
+    except (OSError, ValueError, TypeError):
+        pass
+    return dict(DEFAULT_CFG), 'default'
+
+
+CFG, CFG_SOURCE = load_selected_config()
 
 
 def topk_digits(counter, reverse=True, k=3):
@@ -120,11 +144,15 @@ def main():
         })
 
     summary = {
-        'basis': '基于官方历史、walk-forward参数(window=360, half_life=120)的递推娱乐推荐',
+        'basis': (
+            '基于官方历史、walk-forward参数'
+            f'(window={CFG["window"]}, half_life={CFG["half_life"]})的递推娱乐推荐'
+        ),
         'latest_actual_issue': last_actual['issue'],
         'latest_actual_date': last_actual['date'],
         'latest_actual_number': last_actual['number'],
         'selected_config': CFG,
+        'config_source': CFG_SOURCE,
         'predictions': predictions,
     }
     OUT_JSON.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding='utf-8')
@@ -134,7 +162,10 @@ def main():
     lines.append('')
     lines.append(f'- 基础数据：{len(rows)}期官方历史（{rows[0]["date"]} ~ {rows[-1]["date"]}）')
     lines.append(f'- 最新实绩：第{last_actual["issue"]}期 {last_actual["date"]} 开奖号 {" ".join(last_actual["number"])}')
-    lines.append(f'- 模型参数：window={CFG["window"]}, half_life={CFG["half_life"]}')
+    lines.append(
+        f'- 模型参数：window={CFG["window"]}, half_life={CFG["half_life"]}'
+        f'（来源：{CFG_SOURCE}）'
+    )
     lines.append('- 说明：第2天起按“前一天主推1号”递推上下文，越往后娱乐性越强。')
     lines.append('')
     for item in predictions:

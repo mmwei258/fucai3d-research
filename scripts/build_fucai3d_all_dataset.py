@@ -104,8 +104,10 @@ def main():
         'source': '中国福彩网官方接口',
         'endpoint': 'https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice',
         'lottery': '福彩3D',
-        'requested_dayStart': '2004-01-01',
-        'requested_dayEnd': '2026-04-13',
+        'range': {
+            'dayStart': full[0]['date'] if full else None,
+            'dayEnd': full[-1]['date'] if full else None,
+        },
         'actual_total_records': len(full),
         'first_issue': full[0]['issue'] if full else None,
         'last_issue': full[-1]['issue'] if full else None,
