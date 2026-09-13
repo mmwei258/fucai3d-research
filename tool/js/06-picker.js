@@ -24,6 +24,32 @@
   };
   let wired = false;
 
+  /* 六个筛选输入框的取值范围。规则：
+     - 只能输整数，非数字字符在输入时直接挡掉；
+     - 越界的值【不参与筛选】（宁可不筛，也不能悄悄算出 0 注），输入框标红并写明范围；
+     - 离开输入框时把越界值收进最近的合法值。
+     和值上限 27、跨度上限 9 都是三位数的数学极值；遗漏上限 9999 只是防呆。 */
+  const FIELD = {
+    sumMin:  { group: 'sum',  min: 0, max: 27,   ph: '最小' },
+    sumMax:  { group: 'sum',  min: 0, max: 27,   ph: '最大' },
+    spanMin: { group: 'span', min: 0, max: 9,    ph: '最小' },
+    spanMax: { group: 'span', min: 0, max: 9,    ph: '最大' },
+    gapMin:  { group: 'gap',  min: 0, max: 9999, ph: '最小' },
+    gapMax:  { group: 'gap',  min: 0, max: 9999, ph: '最大' }
+  };
+  const GROUP = {
+    sum:  { name: '和值',     range: '0~27',   maxLen: 2 },
+    span: { name: '跨度',     range: '0~9',    maxLen: 2 },
+    gap:  { name: '号码遗漏', range: '0~9999', maxLen: 4 }
+  };
+
+  // 当前生效的区间：null = 这条筛选不生效（空着或填了非法值）。每次 calc() 前重算。
+  const LIM = { sumMin: null, sumMax: null, spanMin: null, spanMax: null,
+                gapMin: null, gapMax: null };
+  function computeLimits() {
+    Object.keys(FIELD).forEach(function (k) { LIM[k] = fieldVal(k); });
+  }
+
   // 每个号码（000~999）的"当前遗漏"：距离它上次开出过了多少期
   const GAP = (function () {
     const last = new Array(1000).fill(-1);
@@ -54,9 +80,75 @@
   }
 
   function hasAnyFilter() {
-    return f.sumMin !== '' || f.sumMax !== '' || f.spanMin !== '' || f.spanMax !== ''
-        || f.gapMin !== '' || f.gapMax !== ''
+    return LIM.sumMin !== null || LIM.sumMax !== null
+        || LIM.spanMin !== null || LIM.spanMax !== null
+        || LIM.gapMin !== null || LIM.gapMax !== null
         || f.bs.size > 0 || f.oe.size > 0 || danSel.size > 0;
+  }
+
+  // ---------- 筛选输入框的取值范围校验 ----------
+  function fieldNum(key) {
+    const s = String(f[key] === null || f[key] === undefined ? '' : f[key]).trim();
+    if (s === '') return null;              // 空 = 不用这条筛选
+    if (!/^\d+$/.test(s)) return NaN;       // 兜底：理论上输入阶段已挡掉
+    return +s;
+  }
+
+  function fieldOut(key) {                  // 越界（或是非整数）
+    const v = fieldNum(key);
+    if (v === null) return false;
+    return isNaN(v) || v < FIELD[key].min || v > FIELD[key].max;
+  }
+
+  function fieldVal(key) {                  // 只有合法值才参与筛选
+    return fieldOut(key) ? null : fieldNum(key);
+  }
+
+  function groupKeys(group) {
+    return Object.keys(FIELD).filter(function (k) { return FIELD[k].group === group; });
+  }
+
+  function groupInverted(group) {           // 最小值 > 最大值：区间为空
+    const ks = groupKeys(group);
+    const a = fieldVal(ks[0]), b = fieldVal(ks[1]);
+    return a !== null && b !== null && a > b;
+  }
+
+  function groupMsg(group) {                // 该行要显示的问题（红=不参与筛选，橙=区间为空）
+    const ks = groupKeys(group).filter(fieldOut);
+    if (ks.length) {
+      return { level: 'bad',
+        text: GROUP[group].name + '只接受 ' + GROUP[group].range + ' 的整数（当前 ' +
+              ks.map(function (k) { return f[k]; }).join(' / ') + ' 无效，已忽略）' };
+    }
+    if (groupInverted(group)) {
+      return { level: 'amber',
+        text: GROUP[group].name + '的「最小」大于「最大」，这个区间里没有任何数字' };
+    }
+    return null;
+  }
+
+  // 所有不合法的输入，用来在结果区交代"为什么这个值没生效"
+  function badInputs() {
+    return Object.keys(FIELD).filter(fieldOut).map(function (k) {
+      const g = GROUP[FIELD[k].group];
+      return g.name + '「' + f[k] + '」（只接受 ' + g.range + '）';
+    });
+  }
+
+  function invertedInputs() {
+    return Object.keys(GROUP).filter(groupInverted).map(function (gr) {
+      return GROUP[gr].name;
+    });
+  }
+
+  function markField(key, el) {
+    if (el) el.className = fieldOut(key) ? 'bad' : '';
+    const msg = C.$('#pk-err-' + FIELD[key].group);
+    if (!msg) return;
+    const m = groupMsg(FIELD[key].group);
+    msg.className = 'bad-msg' + (m ? (m.level === 'amber' ? ' amber' : '') : ' hidden');
+    msg.textContent = m ? m.text : '';
   }
 
   // 选中的胆码个数已经超过三位号码能容纳的不同数字上限
@@ -65,10 +157,10 @@
   function includeDigit(num, d) { return num.indexOf(String(d)) >= 0; }
 
   function passes(num) {
-    if (f.sumMin !== '' && sumOf(num) < +f.sumMin) return false;
-    if (f.sumMax !== '' && sumOf(num) > +f.sumMax) return false;
-    if (f.spanMin !== '' && spanOf(num) < +f.spanMin) return false;
-    if (f.spanMax !== '' && spanOf(num) > +f.spanMax) return false;
+    if (LIM.sumMin !== null && sumOf(num) < LIM.sumMin) return false;
+    if (LIM.sumMax !== null && sumOf(num) > LIM.sumMax) return false;
+    if (LIM.spanMin !== null && spanOf(num) < LIM.spanMin) return false;
+    if (LIM.spanMax !== null && spanOf(num) > LIM.spanMax) return false;
     if (f.bs.size && !f.bs.has(bigSmallRatio(num))) return false;
     if (f.oe.size && !f.oe.has(oddEvenRatio(num))) return false;
     if (danSel.size) {
@@ -79,8 +171,8 @@
       }
       if (danMode === 'all' ? hit < ds.length : hit === 0) return false;
     }
-    if (f.gapMin !== '' && GAP[+num] < +f.gapMin) return false;
-    if (f.gapMax !== '' && GAP[+num] > +f.gapMax) return false;
+    if (LIM.gapMin !== null && GAP[+num] < LIM.gapMin) return false;
+    if (LIM.gapMax !== null && GAP[+num] > LIM.gapMax) return false;
     return true;
   }
 
@@ -153,15 +245,37 @@
     return wrap;
   }
 
-  function numInput(key, ph, min, max) {
+  /* 只收整数：type=text + inputmode=numeric —— 既能用数字键盘，
+     又能在输入阶段就把非数字字符挡掉（type=number 做不到这件事） */
+  function numInput(key) {
+    const spec = FIELD[key], g = GROUP[spec.group];
     return C.el('input', {
-      type: 'number', id: 'pk-f-' + key, value: f[key], placeholder: ph || '',
-      min: String(min), max: String(max),
+      type: 'text', inputmode: 'numeric', autocomplete: 'off',
+      id: 'pk-f-' + key, value: f[key], placeholder: spec.ph,
+      maxlength: String(g.maxLen),
+      title: g.name + '只能是 ' + g.range + ' 的整数',
+      class: fieldOut(key) ? 'bad' : '',
       oninput: function (e) {
-        f[key] = e.target.value;
+        const digits = String(e.target.value).replace(/[^\d]/g, '');
+        if (digits !== e.target.value) e.target.value = digits;
+        f[key] = digits;
         /* 只更新结果，绝不重建筛选区：
            曾经这里调 refresh() → buildFilters() 把输入框整个换掉，
-           用户敲下第一个字符就失焦（type=number 也无法还原光标位置）。 */
+           用户敲下第一个字符就失焦。 */
+        markField(key, e.target);
+        updateResetBtn();
+        calc();
+      },
+      onblur: function (e) {
+        const v = fieldNum(key);
+        if (v === null || isNaN(v)) {
+          f[key] = '';
+        } else {
+          // 越界就收进最近的合法值；顺便把前导 0 去掉
+          f[key] = String(Math.min(Math.max(v, spec.min), spec.max));
+        }
+        e.target.value = f[key];
+        markField(key, e.target);
         updateResetBtn();
         calc();
       }
@@ -231,27 +345,28 @@
     C.clear(box);
     const grid = C.el('div', { class: 'filter-grid' });
 
-    grid.appendChild(C.el('div', { class: 'filter-item' }, [
-      C.el('span', { class: 'fl', text: '和值' }),
-      numInput('sumMin', '最小', 0, 27),
-      C.el('span', { class: 'sep', text: '~' }),
-      numInput('sumMax', '最大', 0, 27)
-    ]));
+    // 一行两个输入框 + 允许范围 + 出错提示（提示常驻 DOM，只切换显隐，避免重建）
+    function rangeRow(group) {
+      const g = GROUP[group], ks = groupKeys(group);
+      const item = C.el('div', { class: 'filter-item' }, [
+        C.el('span', { class: 'fl', text: g.name }),
+        numInput(ks[0]),
+        C.el('span', { class: 'sep', text: '~' }),
+        numInput(ks[1]),
+        C.el('span', { class: 'sep', text: g.range + (group === 'gap' ? ' 期' : '') })
+      ]);
+      const m = groupMsg(group);
+      item.appendChild(C.el('span', {
+        id: 'pk-err-' + group,
+        class: 'bad-msg' + (m ? (m.level === 'amber' ? ' amber' : '') : ' hidden'),
+        text: m ? m.text : ''
+      }));
+      return item;
+    }
 
-    grid.appendChild(C.el('div', { class: 'filter-item' }, [
-      C.el('span', { class: 'fl', text: '跨度' }),
-      numInput('spanMin', '最小', 0, 9),
-      C.el('span', { class: 'sep', text: '~' }),
-      numInput('spanMax', '最大', 0, 9)
-    ]));
-
-    grid.appendChild(C.el('div', { class: 'filter-item' }, [
-      C.el('span', { class: 'fl', text: '号码遗漏' }),
-      numInput('gapMin', '最小', 0, 9999),
-      C.el('span', { class: 'sep', text: '~' }),
-      numInput('gapMax', '最大', 0, 9999),
-      C.el('span', { class: 'sep', text: '期' })
-    ]));
+    grid.appendChild(rangeRow('sum'));
+    grid.appendChild(rangeRow('span'));
+    grid.appendChild(rangeRow('gap'));
 
     grid.appendChild(C.el('div', { class: 'filter-item' }, [
       C.el('span', { class: 'fl', text: '大小比' }),
@@ -344,6 +459,7 @@
   }
 
   function refresh() {
+    computeLimits();          // 重建前先让区间生效状态与输入框一致
     buildPads();
     buildFilters();
     calc();
@@ -351,6 +467,7 @@
 
   // ---------- 计算与结果 ----------
   function calc() {
+    computeLimits();          // 先把输入框里的值过一遍范围校验，越界的一律不参与筛选
     const pool = baseDirect();
     const recent = recentNumbers();
     const poolNoRecent = pool.filter(function (n) { return !recent.has(n); });
@@ -376,6 +493,11 @@
       const missing = [];
       for (let p = 0; p < 3; p++) if (posSel[p].size === 0) missing.push(POS_NAME[p]);
       const lines = [];
+      const badNow = badInputs();
+      if (badNow.length) {
+        lines.push('筛选条件里有不合法的数值：' + badNow.join('、') +
+                   '——这些值已被忽略，没有参与筛选。');
+      }
       if (missing.length === 3 && grpSel.size === 0) {
         lines.push('还没有选号。点上面的数字按钮开始选择。');
         lines.push('玩法一：直选需要在「第一位 / 第二位 / 第三位」各选至少 1 个数字。');
@@ -439,6 +561,16 @@
       notes.push('胆码选了 ' + danSel.size + ' 个、规则为「必须全含」：三位号码最多含 3 个' +
                  '不同数字，因此 0 注是规则本身的必然结果，不是程序出错。' +
                  '把胆码规则切成「至少含一个」即可出号。');
+    }
+    const badNow = badInputs();
+    if (badNow.length) {
+      notes.push('筛选条件里有不合法的数值：' + badNow.join('、') +
+                 '——这些值已被忽略，没有参与筛选。');
+    }
+    const invNow = invertedInputs();
+    if (invNow.length) {
+      notes.push(invNow.join('、') + ' 的「最小」大于「最大」，这个区间里没有任何数字，' +
+                 '所以 0 注来自区间本身是空的——把两个值对调即可。');
     }
     if (posDigitsSelected() === 0 && pool.length === 1000) {
       notes.push('未指定具体数字，基数是全部 1000 种组合，因此注数较大——' +
