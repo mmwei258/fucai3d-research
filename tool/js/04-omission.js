@@ -161,11 +161,20 @@
   }
 
   /* ---------------- 历史统计：近 30 期 vs 全历史 ---------------- */
+  /* pos 取值 0/1/2 = 百/十/个位；3 = 不分位（该数字出现在任意位置就算命中，
+     也就是走势网格里"不看位置"的那一套口径）。 */
+  const POS_ALL = ['第一位', '第二位', '第三位', '不分位（三位一起看）'];
+  const isAny = function (pos) { return pos === 3; };
+  const keysOfPos = function (pos) { return isAny(pos) ? C.digitKeys : C.keyOfPos(pos); };
+  const hitOf = function (pos, row, d) {
+    return isAny(pos) ? row.d.indexOf(d) >= 0 : row.d[pos] === d;
+  };
+
   // 当前遗漏：与「遗漏统计」页同一口径（0 = 上一期刚出过）
   function currentGap(pos, d) {
     const D = C.DRAWS;
     for (let i = D.length - 1; i >= 0; i--) {
-      if (D[i].d[pos] === d) return D.length - 1 - i;
+      if (hitOf(pos, D[i], d)) return D.length - 1 - i;
     }
     return D.length;
   }
@@ -173,7 +182,7 @@
   // 某窗口内、某位某数字的四项统计。serAll 是整段历史的遗漏序列（每位只算一次，10 个数字复用）
   function windowStats(pos, d, from, serAll) {
     const win = C.DRAWS.slice(from);
-    const hits = win.map(function (r) { return r.d[pos] === d; });
+    const hits = win.map(function (r) { return hitOf(pos, r, d); });
     const count = hits.filter(Boolean).length;
     let maxGap = 0;
     win.forEach(function (r, i) { maxGap = Math.max(maxGap, C.gapOf(serAll[from + i], d)); });
@@ -188,7 +197,7 @@
   function histRows(pos) {
     const D = C.DRAWS;
     const from30 = Math.max(0, D.length - 30);
-    const serAll = C.gapSeries(D, C.keyOfPos(pos), 0);
+    const serAll = C.gapSeries(D, keysOfPos(pos), 0);
     const rows = [];
     for (let d = 0; d <= 9; d++) {
       rows.push({
@@ -317,13 +326,70 @@
     }, [
       C.el('div', {
         style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
-        text: POS_NAME[pos] + '历史数据'
+        text: POS_ALL[pos] + '历史数据'
       }),
       isNarrow ? historyTableNarrow(rows) : C.tableScroll(historyTableWide(rows))
     ]);
   }
 
   let hsNarrow = null;
+  /* ---------------- 连出统计（不分位）：相邻两期重复了几个数字 ----------------
+     「连出」= 上期出现过的数字，这期又出现了（不看位置）。
+     理论分布由规则精确算出（THEORY.overlap），实测值直接数历史，两边并列。 */
+  function overlapTable() {
+    const D = C.DRAWS;
+    const sets = D.map(function (r) { return new Set(r.d); });
+    const cnt = [0, 0, 0, 0];
+    for (let i = 1; i < D.length; i++) {
+      let hit = 0;
+      sets[i].forEach(function (d) { if (sets[i - 1].has(d)) hit++; });
+      cnt[hit]++;
+    }
+    const pairs = D.length - 1;
+    const theory = C.THEORY.overlap;
+
+    const tbody = C.el('tbody');
+    for (let j = 0; j <= 3; j++) {
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', { text: j + ' 个' }),
+        C.el('td', { class: 'num', text: C.comma(cnt[j]) + ' 期' }),
+        C.el('td', { class: 'num', text: C.pct(cnt[j] / pairs) }),
+        C.el('td', { class: 'num', text: C.pct(theory.dist[j]) })
+      ]));
+    }
+    const measuredMean = cnt.reduce(function (s, c, j) { return s + j * c; }, 0) / pairs;
+    tbody.appendChild(C.el('tr', {}, [
+      C.el('td', { text: '平均' }),
+      C.el('td', { class: 'num', text: '—' }),
+      C.el('td', { class: 'num', text: C.fixed(measuredMean, 2) + ' 个/期' }),
+      C.el('td', { class: 'num', text: C.fixed(theory.mean, 2) + ' 个/期' })
+    ]));
+
+    const table = C.el('table', {}, [
+      C.el('thead', {}, [C.el('tr', {}, [
+        // 手机版表头用短标题：完整的解释在上面的说明里，窄屏放不下长表头
+        C.el('th', { text: C.narrow() ? '重复数字个数' : '相邻两期重复的数字个数' }),
+        C.el('th', { text: '出现期数' }),
+        C.el('th', { text: '实测占比' }),
+        C.el('th', { text: '理论占比' })
+      ])]),
+      tbody
+    ]);
+
+    return C.el('div', {}, [
+      C.tableScroll(table),
+      C.el('div', {
+        class: 'hint', style: 'margin-top:10px',
+        html: '实测与理论几乎完全重合。也就是说：<b>大约 ' +
+              C.pct(theory.onePlus, 1) + ' 的期数里，都会有一个以上的数字与上期重复</b>——' +
+              '这是随机结果，不是"热号在延续"。<br>' +
+              '原因：单个数字出现在任意位置的概率是 ' +
+              C.pct(1 - Math.pow(0.9, 3), 1) + '（三位都不是它的概率 0.9³ = 72.9%），' +
+              '所以 10 个数字里平均就有 0.73 个会连着两期都出现。'
+      })
+    ]);
+  }
+
   function renderHistory() {
     const box = C.$('#hs-tables');
     if (!box) return;
@@ -332,7 +398,7 @@
     hsNarrow = isNarrow;
     C.clear(box);
     const outer = C.el('div', { class: 'grid2' });
-    for (let p = 0; p < 3; p++) outer.appendChild(historyBlock(p, histRows(p)));
+    for (let p = 0; p < 4; p++) outer.appendChild(historyBlock(p, histRows(p)));
     outer.appendChild(C.el('div', {
       style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
     }, [
@@ -341,22 +407,29 @@
         text: '怎么读这张表'
       }),
       C.el('div', { style: 'font-size:12.5px;color:var(--ink-2)' }, [
-        C.el('div', { text: '· 平均遗漏：理论值恒为 10.0 期（每位每数字出现概率都是 1/10）。' }),
+        C.el('div', { text: '· 平均遗漏：按位置看，理论值恒为 10.0 期（每位每数字出现概率 1/10）；' +
+                          '不分位看，理论值为 3.7 期（数字出现在任意位置的概率是 27.1%）。' }),
         C.el('div', { style: 'margin-top:6px',
-          text: '· 最大遗漏：这个数字在该位置"最长一次连续多少期没出现"。全历史里出现 50~80 期都属正常。' }),
+          text: '· 最大遗漏：这个数字"最长一次连续多少期没出现"。按位置看，全历史里 50~80 期属正常；' +
+                '不分位看，20~31 期属正常。' }),
         C.el('div', { style: 'margin-top:6px',
-          text: '· 最大连出：连续多少期都出现（理论上连出 2 期的概率 1%，3 期 0.1%）。' }),
+          text: '· 最大连出：连续多少期都出现。按位置看，连出 2 期的概率 1%、3 期 0.1%；' +
+                '不分位看，一个数字每期出现的概率就有 27.1%，连出很常见（连出 4 期约 0.5%）。' }),
         C.el('div', { style: 'margin-top:6px',
           text: '· 近 30 期出现 0~6 次都是随机正常范围；短窗口里"偏热偏冷"是必然现象，不是信号。' })
       ])
     ]));
     box.appendChild(outer);
+
+    const ovBox = C.$('#hs-overlap');
+    if (ovBox) { C.clear(ovBox); ovBox.appendChild(overlapTable()); }
   }
 
   window.OMISSION = {
     render: render,
     _windowStats: function (pos, d, from) {
-      return windowStats(pos, d, from, C.gapSeries(C.DRAWS, C.keyOfPos(pos), 0));
+      // 用 keysOfPos：pos = 3 时是不分位口径（数字出现在任意位置都算命中）
+      return windowStats(pos, d, from, C.gapSeries(C.DRAWS, keysOfPos(pos), 0));
     },
     _currentGap: currentGap
   };

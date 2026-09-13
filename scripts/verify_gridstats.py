@@ -113,3 +113,50 @@ print("对撞用的关键值（verify_logic.js 第 7 节）：")
 for d in (1, 5):
     r = rows[d]
     print(f"  百位数字{d}: 当前遗漏={r['cur']} 近30={r['near']} 全历史={r['all']}")
+
+# ---------------- 不分位：数字出现在任意位置就算命中 ----------------
+print()
+print("=== 不分位统计（不看位置）===")
+SETS = [set(g) for g in DIGITS]
+ser_any = gap_series(lambda i: list(SETS[i]))
+any_rows = {}
+for d in range(10):
+    hits = [d in s for s in SETS]
+    cur = next((N - 1 - i for i in range(N - 1, -1, -1) if d in SETS[i]), N)
+
+    def stat(frm):
+        win = hits[frm:]
+        c = sum(win)
+        mx = max([gap(ser_any[frm + j], d, frm + j) for j in range(len(win))] or [0])
+        best = run = 0
+        for h in win:
+            run = run + 1 if h else 0
+            best = max(best, run)
+        return {"count": c, "avg": (len(win) / c if c else None), "max": mx, "streak": best}
+
+    any_rows[d] = {"cur": cur, "near": stat(N - 30), "all": stat(0)}
+    a = any_rows[d]
+    print(f"   数字{d} 当前遗漏={a['cur']:>3}  近30(出现{a['near']['count']:>2}/最大{a['near']['max']:>2}/连出{a['near']['streak']})"
+          f"  全历史(出现{a['all']['count']}/均{a['all']['avg']:.1f}/最大{a['all']['max']}/连出{a['all']['streak']})")
+
+# ---------------- 连出：相邻两期重复了几个数字 ----------------
+print()
+print("=== 连出统计（不分位）===")
+from collections import Counter
+cnt = Counter(len(SETS[i] & SETS[i - 1]) for i in range(1, N))
+pairs = N - 1
+print("  实测: " + " / ".join(f"{j}个 {cnt[j]}期 {cnt[j] / pairs * 100:.2f}%" for j in range(4)))
+print(f"  实测平均重复 {sum(j * c for j, c in cnt.items()) / pairs:.4f} 个/期")
+theo = Counter()
+for a in range(1000):
+    sa = set(map(int, str(a).zfill(3)))
+    for b in range(1000):
+        theo[len(sa & set(map(int, str(b).zfill(3))))] += 1
+tot = 1000 * 1000
+print("  理论: " + " / ".join(f"{j}个 {theo[j]}对 {theo[j] / tot * 100:.2f}%" for j in range(4)))
+print(f"  理论平均重复 {sum(j * c for j, c in theo.items()) / tot:.4f} 个/期"
+      f"；至少一个连出的概率 {100 - theo[0] / tot * 100:.2f}%")
+print()
+print("对撞用的关键值（verify_logic.js 第 8 节）：")
+print("  不分位数字1:", any_rows[1])
+print("  不分位数字5:", any_rows[5])

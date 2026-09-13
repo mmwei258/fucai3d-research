@@ -38,6 +38,30 @@
         .slice(0, 3).map(function (x) { return x[0]; });
     };
     const sumTop3 = top3(sum), spanTop3 = top3(span);
+
+    /* 相邻两期"重复数字个数"的精确分布（不分位：只看数字有没有再出现，不看位置）。
+       上期开出 k 个不同数字的概率由规则决定（组六 0.72 / 组三 0.27 / 豹子 0.01）；
+       本期 3 位数字与上期集合的交集大小，用 1000 种组合穷举，再按 k 加权。 */
+    const overlap = (function () {
+      const sizeShare = [0, 0, 0, 0];
+      for (let n = 0; n < 1000; n++) {
+        const a = Math.floor(n / 100), b = Math.floor(n / 10) % 10, c = n % 10;
+        sizeShare[new Set([a, b, c]).size] += 1 / 1000;
+      }
+      const dist = [0, 0, 0, 0];
+      for (let k = 1; k <= 3; k++) {
+        const cnt = [0, 0, 0, 0];
+        for (let n = 0; n < 1000; n++) {
+          const t = [Math.floor(n / 100), Math.floor(n / 10) % 10, n % 10];
+          const hit = new Set(t.filter(function (d) { return d < k; })).size;
+          cnt[hit] += 1;
+        }
+        for (let j = 0; j <= 3; j++) dist[j] += sizeShare[k] * cnt[j] / 1000;
+      }
+      const mean = dist.reduce(function (s, p, j) { return s + j * p; }, 0);
+      return { dist: dist, mean: mean, onePlus: 1 - dist[0] };
+    })();
+
     return {
       sum: sum, span: span, type: type, posDigit: posDigit,
       sumTop3: sumTop3, spanTop3: spanTop3,
@@ -46,7 +70,8 @@
       sumTop3Rate: sumTop3.reduce(function (s, i) { return s + sum[i]; }, 0) / 1000,
       spanTop3Rate: spanTop3.reduce(function (s, i) { return s + span[i]; }, 0) / 1000,
       typeTop1Rate: Math.max(type['豹子'], type['组三'], type['组六']) / 1000,
-      groupTop20Rate: 20 / 220
+      groupTop20Rate: 20 / 220,
+      overlap: overlap
     };
   })();
 
