@@ -10,6 +10,7 @@ verify_logic.js 第 7 节把这些数字硬编码成断言，页面每次构建�
 """
 
 import json
+from itertools import combinations
 from math import comb
 from pathlib import Path
 
@@ -200,3 +201,33 @@ print("对撞用的关键值（verify_logic.js 第 8 节）：")
 print("  2 期无重号 =", f"{no_repeat_window(2) * 100:.4f}%",
       " 5 期 =", f"{no_repeat_window(5) * 100:.4f}%",
       " 10 期 =", f"{no_repeat_window(10) * 100:.4f}%")
+
+# ---------------- 指定 k 个数字：一起出现 / 连着两期都出现 ----------------
+def all_in(k):
+    """指定 k 个数字"某一期里全都出现"的精确概率（容斥）"""
+    return sum((-1) ** j * comb(k, j) * (10 - j) ** 3 for j in range(k + 1)) / 1000
+
+
+print()
+print("=== 指定几个数字（不分位）===")
+print("  指定      单期都出现     连着两期都出现    平均多少期遇到一次")
+for k in (1, 2, 3):
+    p = all_in(k)
+    print(f"  {k} 个   {p * 100:9.4f}%   {p * p * 100:12.6f}%   {1 / (p * p):>12,.0f} 期")
+print("  实测（所有组合取平均）:")
+for k in (1, 2, 3):
+    combos = list(combinations(range(10), k))
+    hit = both = 0
+    for c in combos:
+        for i in range(N):
+            if all(d in SETS[i] for d in c):
+                hit += 1
+                if i > 0 and all(d in SETS[i - 1] for d in c):
+                    both += 1
+    print(f"   {k} 个: 单期 {hit / len(combos):.1f} 期（{hit / len(combos) / N * 100:.2f}%），"
+          f"相邻两期 {both / len(combos):.2f} 次（理论 {N * all_in(k) ** 2:.2f}）")
+print("  用户举的例子 7 和 2:")
+h72 = sum(1 for s in SETS if 7 in s and 2 in s)
+b72 = sum(1 for i in range(1, N) if 7 in SETS[i] and 2 in SETS[i] and 7 in SETS[i - 1] and 2 in SETS[i - 1])
+print(f"   单期都出现 {h72} 期（{h72 / N * 100:.2f}%，理论 {all_in(2) * 100:.2f}%）；"
+      f"相邻两期都出现 {b72} 次（理论 {N * all_in(2) ** 2:.1f} 次）")

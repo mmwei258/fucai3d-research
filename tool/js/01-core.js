@@ -70,6 +70,22 @@
         (m * (m - 1) * (m - 2) / 6) * 6];     // j=3：abc 的 6 种排列
     }
 
+    function comb(n, k) {
+      let r = 1;
+      for (let i = 1; i <= k; i++) r = r * (n - i + 1) / i;
+      return r;
+    }
+
+    /* 指定 k 个数字"某一期里全都出现"的精确概率（不分位），容斥算：
+       1000 里减去至少缺一个指定数字的组合数。k=2 就是 54/1000 = 5.4%。 */
+    function allIn(k) {
+      let tot = 0;
+      for (let j = 0; j <= k; j++) {
+        tot += (j % 2 ? -1 : 1) * comb(k, j) * Math.pow(10 - j, 3);
+      }
+      return tot / 1000;
+    }
+
     /* 连续 n 期"一次相邻重号都没有"的概率（精确，不是模拟）。
        马尔可夫链的状态只需要"本期有几个不同数字"：因为"下一期与本期不重叠"
        的概率只取决于 10 减去本期的不同数字个数，而不取决于具体是哪几个数字。 */
@@ -99,7 +115,8 @@
       groupTop20Rate: 20 / 220,
       overlap: overlap,
       triplesByDistinct: triplesByDistinct,
-      noRepeatWindow: noRepeatWindow
+      noRepeatWindow: noRepeatWindow,
+      allIn: allIn
     };
   })();
 

@@ -387,7 +387,100 @@
               C.pct(1 - Math.pow(0.9, 3), 1) + '（三位都不是它的概率 0.9³ = 72.9%），' +
               '所以 10 个数字里平均就有 0.73 个会连着两期都出现。'
       }),
+      specifiedTable(),
       windowTable()
+    ]);
+  }
+
+  /* 指定 k 个数字（比如"7 和 2"）在这一期里都出现、以及连着两期都出现。
+     实测取所有组合的平均：1 个数字 10 组、2 个数字 45 组、3 个数字 120 组。 */
+  function specifiedTable() {
+    const D = C.DRAWS;
+    const sets = D.map(function (r) { return new Set(r.d); });
+    const rows = [];
+    for (let k = 1; k <= 3; k++) {
+      const combos = [];
+      (function build(prefix, next) {
+        if (prefix.length === k) { combos.push(prefix.slice()); return; }
+        for (let d = next; d <= 9; d++) { prefix.push(d); build(prefix, d + 1); prefix.pop(); }
+      })([], 0);
+      let hitSum = 0, bothSum = 0;
+      combos.forEach(function (c) {
+        for (let i = 0; i < D.length; i++) {
+          let all = true;
+          for (let t = 0; t < c.length && all; t++) if (!sets[i].has(c[t])) all = false;
+          if (all) {
+            hitSum++;
+            if (i > 0) {
+              let prevAll = true;
+              for (let t = 0; t < c.length && prevAll; t++) if (!sets[i - 1].has(c[t])) prevAll = false;
+              if (prevAll) bothSum++;
+            }
+          }
+        }
+      });
+      const n = combos.length;
+      const p = C.THEORY.allIn(k);
+      rows.push({
+        k: k,
+        hits: hitSum / n, both: bothSum / n,
+        p: p, bothTheory: p * p
+      });
+    }
+
+    const tbody = C.el('tbody');
+    rows.forEach(function (r) {
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', { text: r.k + ' 个数字' }),
+        C.el('td', { class: 'num', text: C.pct(r.p, 2) }),
+        C.el('td', { class: 'num', text: C.pct(r.p * r.p, 4) }),
+        C.el('td', { class: 'num', text: C.pct(r.hits / C.DRAWS.length, 2) }),
+        C.el('td', { class: 'num', text: C.fixed(r.both, 2) + ' 次' })
+      ]));
+    });
+
+    const t = C.el('table', {}, [
+      C.el('thead', {}, [C.el('tr', {}, [
+        C.el('th', { text: '指定的数字' }),
+        C.el('th', { text: '这一期都出现（理论）' }),
+        C.el('th', { text: '连着两期都出现（理论）' }),
+        C.el('th', { text: '这一期都出现（实测均值）' }),
+        C.el('th', { text: '相邻两期都出现（实测均值）' })
+      ])]),
+      tbody
+    ]);
+
+    // 用用户举的例子把数字讲实：7 和 2
+    let hit72 = 0, both72 = 0;
+    for (let i = 0; i < D.length; i++) {
+      if (sets[i].has(7) && sets[i].has(2)) {
+        hit72++;
+        if (i > 0 && sets[i - 1].has(7) && sets[i - 1].has(2)) both72++;
+      }
+    }
+    const p2 = C.THEORY.allIn(2);
+
+    return C.el('div', { style: 'margin-top:14px' }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
+        text: '指定几个数字：它们一起出现的概率有多大？'
+      }),
+      C.tableScroll(t),
+      C.el('div', {
+        class: 'hint', style: 'margin-top:10px',
+        html: '拿"7 和 2"举例：一期里 7、2 都出现（不看位置）的概率是 <b>' +
+              C.pct(p2, 2) + '</b>（54 ÷ 1000）；' +
+              '它们<b>连着两期都出现</b>的概率是 <b>' + C.pct(p2 * p2, 4) + '</b>，' +
+              '大约 ' + C.comma(Math.round(1 / (p2 * p2))) + ' 期遇到一次。<br>' +
+              '实测：我们的 ' + C.comma(D.length) + ' 期里，含 7 和 2 的有 ' + hit72 +
+              ' 期（' + C.pct(hit72 / D.length, 2) + '），其中"相邻两期都含 7 和 2"' +
+              '出现了 ' + both72 + ' 次，理论期望 ' +
+              C.fixed(D.length * p2 * p2, 1) + ' 次——完全在随机范围内。<br>' +
+              '<b>上期出现过 7 和 2，并不改变下一期的概率，还是 ' + C.pct(p2, 2) + '。</b>' +
+              '连得越长越罕见：' + C.pct(p2, 2) + '（1 期）→ ' + C.pct(p2 * p2, 4) +
+              '（连 2 期）→ ' + C.pct(Math.pow(p2, 3), 5) + '（连 3 期）→ ' +
+              C.pct(Math.pow(p2, 4), 5) + '（连 4 期）。'
+      })
     ]);
   }
 
