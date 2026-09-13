@@ -86,6 +86,22 @@
       return tot / 1000;
     }
 
+    /* 上期开出 k 个不同数字时，本期与它"共有 2 个以上数字"的概率。
+       组六(k=3) 15.00%、组三(k=2) 5.40%、豹子(k=1) 0——按规则占比加权就是 12.258%。 */
+    function shareTwoGiven(k) {
+      let hit = 0;
+      for (let n = 0; n < 1000; n++) {
+        const t = [Math.floor(n / 100), Math.floor(n / 10) % 10, n % 10];
+        const seen = {};
+        let shared = 0;
+        t.forEach(function (d) {
+          if (d < k && !seen[d]) { seen[d] = 1; shared++; }
+        });
+        if (shared >= 2) hit++;
+      }
+      return hit / 1000;
+    }
+
     /* 连续 n 期"一次相邻重号都没有"的概率（精确，不是模拟）。
        马尔可夫链的状态只需要"本期有几个不同数字"：因为"下一期与本期不重叠"
        的概率只取决于 10 减去本期的不同数字个数，而不取决于具体是哪几个数字。 */
@@ -116,7 +132,8 @@
       overlap: overlap,
       triplesByDistinct: triplesByDistinct,
       noRepeatWindow: noRepeatWindow,
-      allIn: allIn
+      allIn: allIn,
+      shareTwoGiven: shareTwoGiven
     };
   })();
 

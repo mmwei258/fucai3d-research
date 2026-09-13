@@ -231,3 +231,22 @@ h72 = sum(1 for s in SETS if 7 in s and 2 in s)
 b72 = sum(1 for i in range(1, N) if 7 in SETS[i] and 2 in SETS[i] and 7 in SETS[i - 1] and 2 in SETS[i - 1])
 print(f"   单期都出现 {h72} 期（{h72 / N * 100:.2f}%，理论 {all_in(2) * 100:.2f}%）；"
       f"相邻两期都出现 {b72} 次（理论 {N * all_in(2) ** 2:.1f} 次）")
+
+# ---------------- 「任意两个」：相邻两期共有 2 个以上数字 ----------------
+print()
+print("=== 任意两个（不指定具体哪一对）===")
+dist_theory = Counter()
+for _a in range(1000):
+    _sa = set(map(int, str(_a).zfill(3)))
+    for _b in range(1000):
+        dist_theory[len(_sa & set(map(int, str(_b).zfill(3))))] += 1
+_tot = 1000 * 1000
+ge2 = sum(1 for i in range(1, N) if len(SETS[i] & SETS[i - 1]) >= 2)
+print(f"  理论：{100 * (dist_theory[2] + dist_theory[3]) / _tot:.4f}%"
+      f"（2 个 {dist_theory[2] / _tot * 100:.4f}% + 3 个 {dist_theory[3] / _tot * 100:.4f}%）")
+print(f"  实测：{ge2}/{N - 1} = {ge2 / (N - 1) * 100:.4f}%   平均 {(N - 1) / ge2:.2f} 期一次")
+print("  分层（上期有几个不同数字时，本期与它共有 2 个以上的概率）:")
+for k in (1, 2, 3):
+    A = set(range(k))
+    hit = sum(1 for n in range(1000) if len(A & set(map(int, str(n).zfill(3)))) >= 2)
+    print(f"    上期 {k} 个不同数字: {hit}/1000 = {hit / 10:.2f}%")

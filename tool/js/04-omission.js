@@ -459,6 +459,15 @@
       }
     }
     const p2 = C.THEORY.allIn(2);
+    // 「任意两个」：相邻两期共有 2 个以上数字的实测（613/4,749）
+    let share2 = 0;
+    for (let i = 1; i < D.length; i++) {
+      let n = 0;
+      sets[i].forEach(function (d) { if (sets[i - 1].has(d)) n++; });
+      if (n >= 2) share2++;
+    }
+    const pairsAll = D.length - 1;
+    const pAny = C.THEORY.overlap.dist[2] + C.THEORY.overlap.dist[3];
 
     return C.el('div', { style: 'margin-top:14px' }, [
       C.el('div', {
@@ -476,11 +485,31 @@
               ' 期（' + C.pct(hit72 / D.length, 2) + '），其中"相邻两期都含 7 和 2"' +
               '出现了 ' + both72 + ' 次，理论期望 ' +
               C.fixed(D.length * p2 * p2, 1) + ' 次——完全在随机范围内。<br>' +
-              '<b>上期出现过 7 和 2，并不改变下一期的概率，还是 ' + C.pct(p2, 2) + '。</b>' +
-              '连得越长越罕见：' + C.pct(p2, 2) + '（1 期）→ ' + C.pct(p2 * p2, 4) +
-              '（连 2 期）→ ' + C.pct(Math.pow(p2, 3), 5) + '（连 3 期）→ ' +
-              C.pct(Math.pow(p2, 4), 5) + '（连 4 期）。'
-      })
+              '<b>上期出现过 7 和 2，并不改变下一期的概率，还是 ' + C.pct(p2, 2) + '。</b>'
+      }),
+      C.el('div', { class: 'note warn', style: 'margin-top:12px' }, [
+        C.el('div', {
+          html: '<b>「指定两个数字」和「任意两个数字」是两个完全不同的问题</b>，' +
+                '看数字时要分清：'
+        }),
+        C.el('div', { style: 'margin-top:6px', html:
+          '· <b>指定</b>：你事先盯住 7 和 2 这一对——下一期它俩都出现 ' + C.pct(p2, 2) +
+          '，连着两期都出现只有 <b>' + C.pct(p2 * p2, 4) + '</b>（约 ' +
+          C.comma(Math.round(1 / (p2 * p2))) + ' 期一次）。' }),
+        C.el('div', { style: 'margin-top:6px', html:
+          '· <b>任意</b>：不指定具体哪一对，只要上期开出的数字里有 2 个（或 3 个）' +
+          '在这一期又出现——理论 <b>' + C.pct(pAny, 2) + '</b>，实测 <b>' +
+          C.pct(share2 / pairsAll, 2) + '</b>（' + C.comma(share2) + ' / ' +
+          C.comma(pairsAll) + ' 组相邻期），平均 <b>' +
+          C.fixed(pairsAll / share2, 1) + ' 期就有一次</b>。' }),
+        C.el('div', { style: 'margin-top:6px', html:
+          '· 还分层：上期是<b>组六</b>（3 个不同数字，占 72% 的期数）→ ' +
+          C.pct(C.THEORY.shareTwoGiven(3), 2) + '；上期是<b>组三</b>（2 个不同数字）→ ' +
+          C.pct(C.THEORY.shareTwoGiven(2), 2) + '；上期是豹子 → 不可能。' }),
+        C.el('div', { style: 'margin-top:6px', html:
+          '差别在于"任意"有很多种配对方式，机会自然大得多——但两个数字都完全落在' +
+          '随机预期内，没有可利用的规律。' })
+      ])
     ]);
   }
 
