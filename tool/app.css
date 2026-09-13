@@ -166,6 +166,8 @@ button.btn:disabled { opacity: .5; cursor: default; }
   gap: 6px;
   min-width: 104px;
   padding: 14px 22px;
+  white-space: nowrap;      /* 不允许文字换行成"✕ 清 / 空" */
+  flex: 0 0 auto;           /* 不参与拉伸，保持本身尺寸 */
   font-family: inherit;
   font-size: 16px;
   font-weight: 700;
@@ -511,9 +513,13 @@ footer.end {
   th, td { padding: 5px 7px; }
   .bar-cell { width: 34%; }
 
-  /* 数字按钮：一行 5 个，触控目标加大 */
-  #pk-pos button, #pk-group button { flex: 1 1 17%; min-width: 44px; }
-  .digit-btn { padding: 10px 0; font-size: 16px; }
+    /* 数字按钮：一行 5 个，触控目标加大
+       必须限定 .digit-btn —— 否则同容器内的 .clear-btn 也会被拉伸成整行宽 */
+    #pk-pos button.digit-btn, #pk-group button.digit-btn { flex: 1 1 17%; min-width: 44px; }
+    .digit-btn { padding: 10px 0; font-size: 16px; }
+
+    /* 清除按钮窄屏收紧，但仍明显大于数字键，且不换行 */
+    .clear-btn { min-width: 92px; padding: 11px 16px; font-size: 15px; }
 
   /* 统计卡片两列 */
   .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
