@@ -528,8 +528,16 @@ footer.end {
     #pk-pos button.digit-btn, #pk-group button.digit-btn { flex: 1 1 17%; min-width: 44px; }
     .digit-btn { padding: 10px 0; font-size: 16px; }
 
-    /* 清除按钮跟随数字键高度，字号略增 */
-    .clear-btn { padding: 10px 12px; font-size: 14px; min-width: 76px; }
+    /* 窄屏下数字键占满两行，清空按钮另起一行并占满整行——
+       比缩成一个小按钮吊在第三行更好看，也更好点 */
+    .clear-btn {
+      flex: 1 1 100%;
+      margin-left: 0;
+      margin-top: 4px;
+      min-width: 0;
+      padding: 10px 12px;
+      font-size: 15px;
+    }
 
   /* 统计卡片两列 */
   .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
