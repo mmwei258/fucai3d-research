@@ -177,9 +177,17 @@
   }
 
   // ---------- 选号 ----------
-  function recentNumbers() {
-    const n = C.$('#pk-exclude-recent').checked ? 30 : 0;
+  // 排除窗口：0 = 不排除，其余 = 排除最近 N 期开出过的号码（去重后可能少于 N）
+  const EXCL_OPTIONS = [0, 30, 50, 100, 150, 200];
+  function exclWindow() {
+    const el = C.$('#pk-exclude-window');
+    const v = el ? +el.value : 30;
+    return EXCL_OPTIONS.indexOf(v) >= 0 ? v : 30;
+  }
+
+  function recentNumbers(n) {
     const s = new Set();
+    if (!n) return s;
     C.sliceWindow(D, n).forEach(function (r) { s.add(r.number); });
     return s;
   }
@@ -469,7 +477,8 @@
   function calc() {
     computeLimits();          // 先把输入框里的值过一遍范围校验，越界的一律不参与筛选
     const pool = baseDirect();
-    const recent = recentNumbers();
+    const exclN = exclWindow();
+    const recent = recentNumbers(exclN);
     const poolNoRecent = pool.filter(function (n) { return !recent.has(n); });
     const direct = poolNoRecent.filter(passes);
 
@@ -517,8 +526,8 @@
           const names = unfiltered.slice(0, 20).join('、') +
                         (unfiltered.length > 20 ? ' …' : '');
           lines.push('所选号码 ' + names +
-                     ' 全部落在「最近 30 期已开出」范围内，已被排除规则过滤掉。' +
-                     '取消勾选即可包含它们。');
+                     ' 全部落在「最近 ' + exclWindow() + ' 期已开出」范围内，' +
+                     '已被排除规则过滤掉。把上面的排除窗口改小、或选「不排除」即可包含它们。');
         }
         if (grpSel.size === 1) {
           lines.push('组选目前只选了 1 个数字，至少需要 2 个才能组合出号码。');
@@ -551,7 +560,12 @@
     // ---- 筛选了多少，必须自己交代清楚 ----
     const notes = [];
     if (poolNoRecent.length !== pool.length) {
-      notes.push('「排除最近 30 期已开出」剔除了 ' + (pool.length - poolNoRecent.length) + ' 个号码。');
+      notes.push('「排除最近 ' + exclN + ' 期已开出」剔除了 ' +
+                 (pool.length - poolNoRecent.length) + ' 个号码' +
+                 '（这 ' + exclN + ' 期共开出 ' + recent.size + ' 个不同的号码，' +
+                 '占全部 1000 个直选组合的 ' + C.pct(recent.size / 1000, 1) + '）。' +
+                 '被排掉的号码下期再出的概率和其它号码一样，' +
+                 '所以这只是主动少覆盖这些组合，不会让剩下的号码更容易中。');
     }
     if (hasAnyFilter() && poolNoRecent.length !== nDirect) {
       notes.push('筛选条件从 ' + poolNoRecent.length + ' 个直选号码中保留了 ' +
@@ -677,7 +691,7 @@
         f.bs.clear(); f.oe.clear();
         refresh();
       });
-      C.$('#pk-exclude-recent').addEventListener('change', calc);
+      C.$('#pk-exclude-window').addEventListener('change', calc);
       C.$('#pk-calc').addEventListener('click', calc);
     }
     refresh();

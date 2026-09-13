@@ -181,8 +181,16 @@
       <div class="row" style="margin-top:16px">
         <button class="btn" id="pk-calc">计算</button>
         <button class="btn ghost" id="pk-clear">清空</button>
-        <label class="chk"><input type="checkbox" id="pk-exclude-recent" checked>
-          排除最近 30 期已开出的号码</label>
+        <label>排除已开出的号码
+          <select id="pk-exclude-window">
+            <option value="0">不排除</option>
+            <option value="30" selected>最近 30 期</option>
+            <option value="50">最近 50 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="150">最近 150 期</option>
+            <option value="200">最近 200 期</option>
+          </select>
+        </label>
       </div>
 
       <div id="pk-result" style="margin-top:16px"></div>
@@ -217,6 +225,21 @@
         <button class="btn" id="bt-run">开始回测</button>
       </div>
       <div id="bt-result" style="margin-top:16px"></div>
+    </div>
+
+    <div class="card">
+      <h2>对照实验：排除最近 N 期已开出的号码，有用吗？</h2>
+      <p class="hint">
+        选号器里有一个「排除已开出的号码」开关（30 / 50 / 100 / 150 / 200 期可选）。
+        这里用同一批 <b>500 期样本外数据</b>直接检验它：
+        对每一期，先按策略排序 000~999，再剔除最近 N 期开出过的号码，然后取 Top20。
+        如果窗口越大命中率不升反降，说明它只能"少买少亏"，不能提高中奖概率。
+      </p>
+      <div class="row">
+        <button class="btn" id="bt-excl-run">跑排除窗口对照</button>
+        <span class="hint" id="bt-excl-status"></span>
+      </div>
+      <div id="bt-excl" style="margin-top:16px"></div>
     </div>
 
     <div class="card">
