@@ -598,6 +598,9 @@ footer.end {
 
 .draw-num { color: #c0392b; font-weight: 600; letter-spacing: 1px; }
 
+/* 手机版：组态色块后面跟的一行小字（另外两种组态各遗漏多少期） */
+.gap-mini { margin-left: 6px; font-size: 11.5px; color: var(--ink-3); }
+
 /* 球号徽标（历史统计表第一列） */
 .ball-badge {
   display: inline-flex;

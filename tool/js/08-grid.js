@@ -31,9 +31,15 @@
   }
 
   /* ---------------- 走势网格 ---------------- */
-  const GW = 26, RH = 22, HEAD = 20, ISSUE_W = 56;
+  const GW_WIDE = 26, RH_WIDE = 22;
+  // 手机上把行高加大、字形放大（看得清），列宽只加到刚好放得下——
+  // 390px 屏的可用宽度约 340px，56 + 10×28 = 336 正好不触发横向滚动
+  const GW_NARROW = 28, RH_NARROW = 25;
+  const HEAD = 20, ISSUE_W = 56;
 
-  function gridChart(rows, from, posIdx, showLine) {
+  function gridChart(rows, from, posIdx, showLine, isNarrow) {
+    const GW = isNarrow ? GW_NARROW : GW_WIDE;
+    const RH = isNarrow ? RH_NARROW : RH_WIDE;
     const isAny = posIdx === 3;
     const keysOf = isAny ? C.digitKeys : C.keyOfPos(posIdx);
     const series = C.gapSeries(D, keysOf, from);
@@ -121,16 +127,17 @@
     const posIdx = +C.$('#tg-pos').value;
     const n = +C.$('#tg-n').value;
     const showLine = C.$('#tg-line').checked;
+    const isNarrow = C.narrow();
     const from = Math.max(0, D.length - n);
     const rows = D.slice(from);
 
     const head = C.el('div', {
       style: 'font-size:12.5px;color:' + GRID_COLOR[posIdx] +
              ';margin:2px 0 6px 6px;font-weight:600',
-      text: POS_NAME[posIdx] + '　最近 ' + rows.length + ' 期'
+      text: POS_NAME[posIdx] + '　最近 ' + rows.length + ' 期' + (isNarrow ? '（手机版格子加大）' : '')
     });
     box.appendChild(head);
-    box.appendChild(gridChart(rows, from, posIdx, showLine));
+    box.appendChild(gridChart(rows, from, posIdx, showLine, isNarrow));
 
     C.clear(C.$('#tg-legend'));
     C.$('#tg-legend').appendChild(C.el('div', {
@@ -144,27 +151,18 @@
   }
 
   /* ---------------- 开奖记录 ---------------- */
-  function renderDrawLog() {
-    const box = C.$('#dl-table');
-    C.clear(box);
-    const n = +C.$('#dl-n').value;
-    const showGap = C.$('#dl-gap').checked;
-    const from = Math.max(0, D.length - n);
-    const rows = D.slice(from);
-    const series = C.gapSeries(D, C.keyOfType, from);
+  function typeBlock(t) {
+    return C.el('span', { class: 'type-block', style: 'background:' + TYPE_COLOR[t], text: t });
+  }
 
+  // 电脑版：三栏分开（组三 / 组六 / 豹子），命中那栏是色块
+  function drawLogWide(rows, series, showGap) {
     const tbody = C.el('tbody');
     rows.forEach(function (r, i) {
       const cells = [];
       TYPE_ORDER.forEach(function (t) {
         if (r.type === t) {
-          cells.push(C.el('td', {}, [
-            C.el('span', {
-              class: 'type-block',
-              style: 'background:' + TYPE_COLOR[t],
-              text: t
-            })
-          ]));
+          cells.push(C.el('td', {}, [typeBlock(t)]));
         } else {
           cells.push(C.el('td', {
             class: 'num',
@@ -178,8 +176,7 @@
         cells[0], cells[1], cells[2]
       ]));
     });
-
-    const table = C.el('table', {}, [
+    return C.el('table', {}, [
       C.el('thead', {}, [C.el('tr', {}, [
         C.el('th', { text: '期次' }),
         C.el('th', { text: '开奖号' }),
@@ -189,10 +186,54 @@
       ])]),
       tbody
     ]);
-    box.appendChild(C.tableScroll(table));
+  }
+
+  /* 手机版：三栏并成一栏——色块后面跟一行小字写另外两种组态各遗漏多少期，
+     这样一行放得下，不用左右滑，也不用为了对齐把数字挤成两行。 */
+  function drawLogNarrow(rows, series, showGap) {
+    const tbody = C.el('tbody');
+    rows.forEach(function (r, i) {
+      const others = TYPE_ORDER.filter(function (t) { return t !== r.type; })
+        .map(function (t) { return t + ' ' + C.gapOf(series[i], t); }).join(' · ');
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', { class: 'num', text: r.issue }),
+        C.el('td', { class: 'num draw-num', text: r.number }),
+        C.el('td', {}, [
+          typeBlock(r.type),
+          showGap
+            ? C.el('span', { class: 'gap-mini', text: others })
+            : null
+        ])
+      ]));
+    });
+    return C.el('table', {}, [
+      C.el('thead', {}, [C.el('tr', {}, [
+        C.el('th', { text: '期次' }),
+        C.el('th', { text: '开奖号' }),
+        C.el('th', { text: '组态（另两种的遗漏）' })
+      ])]),
+      tbody
+    ]);
+  }
+
+  function renderDrawLog() {
+    const box = C.$('#dl-table');
+    C.clear(box);
+    const n = +C.$('#dl-n').value;
+    const showGap = C.$('#dl-gap').checked;
+    const from = Math.max(0, D.length - n);
+    const rows = D.slice(from);
+    const series = C.gapSeries(D, C.keyOfType, from);
+
+    const isNarrow = C.narrow();
+    box.appendChild(C.tableScroll(isNarrow
+      ? drawLogNarrow(rows, series, showGap)
+      : drawLogWide(rows, series, showGap)));
     box.appendChild(C.el('div', {
       class: 'note',
-      text: '色块 = 当期开出的组态；同一行其余两栏是"距上次出现过了多少期"。' +
+      text: '色块 = 当期开出的组态；' + (isNarrow
+              ? '后面小字是另外两种组态"距上次出现过了多少期"。'
+              : '同一行其余两栏是"距上次出现过了多少期"。') +
             '豹子（三个数字相同）理论上约 1% 才会出现一次，' +
             '所以那一栏常年是三位数，这是正常的，不代表"快出了"。'
     }));
@@ -200,7 +241,8 @@
     C.clear(C.$('#dl-legend'));
     C.$('#dl-legend').appendChild(C.el('div', {
       html: '数据源：中国福彩网官方接口，共 ' + D.length + ' 期（' +
-            D[0].issue + ' ~ ' + D[D.length - 1].issue + '）。'
+            D[0].issue + ' ~ ' + D[D.length - 1].issue + '）。' +
+            (isNarrow ? '手机版三栏并成一栏，电脑版是三栏分开的表格。' : '')
     }));
   }
 
@@ -215,6 +257,11 @@
     ['#dl-n', '#dl-gap'].forEach(function (sel) {
       const el = document.querySelector(sel);
       if (el) el.addEventListener('change', renderDrawLog);
+    });
+    // 手机 ↔ 电脑（旋转屏幕 / 拖窗口）时换一套排版
+    C.onNarrowChange(function () {
+      renderGrid();
+      renderDrawLog();
     });
   });
 })();

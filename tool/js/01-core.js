@@ -107,6 +107,29 @@
     return c;
   }
 
+  // ---------- 窄屏判定：手机版和电脑版用不同排版 ----------
+  /* 手机上的表格如果照搬电脑版，10 列塞不下就得横向滑动、第一列还会滑出视野。
+     所以窄屏时改成"少列多行"的卡片式排版，两种版式各自都用得顺手。 */
+  function narrow() {
+    try {
+      // 断点与 app.css 的「手机适配」一致（max-width: 760px），
+      // 否则 641~760px 这段会用到手机版 CSS 却排出电脑版表格
+      return !!(window.matchMedia && window.matchMedia('(max-width: 760px)').matches);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  // 只在"宽/窄"真的切换时才回调（旋转屏幕、拖窗口），避免 resize 抖动里反复重绘
+  function onNarrowChange(fn) {
+    if (!window.addEventListener) return;
+    let last = narrow();
+    window.addEventListener('resize', function () {
+      const cur = narrow();
+      if (cur !== last) { last = cur; fn(cur); }
+    });
+  }
+
   // ---------- 逐期遗漏序列（走势网格 / 开奖记录 / 历史统计共用）----------
   /* keysOf(row) 返回该期"命中的键"（可以是多个）。
      返回数组的第 i 项对应 rows[from + i] 这一期【开奖之前】的状态：
@@ -205,6 +228,7 @@
     posCounts: posCounts,
     gapSeries: gapSeries, gapOf: gapOf, maxStreak: maxStreak,
     digitKeys: digitKeys, keyOfPos: keyOfPos, keyOfType: keyOfType,
+    narrow: narrow, onNarrowChange: onNarrowChange,
     buildTabs: buildTabs,
     show: show
   };

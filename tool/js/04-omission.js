@@ -185,7 +185,7 @@
     };
   }
 
-  function historyBlock(pos) {
+  function histRows(pos) {
     const D = C.DRAWS;
     const from30 = Math.max(0, D.length - 30);
     const serAll = C.gapSeries(D, C.keyOfPos(pos), 0);
@@ -198,16 +198,24 @@
         all: windowStats(pos, d, 0, serAll)
       });
     }
+    return rows;
+  }
 
+  function curCell(x) {
+    return C.el('td', { class: 'num' }, [
+      x.cur >= 30
+        ? C.el('span', { class: 'tag hot', text: String(x.cur) })
+        : C.el('span', { text: String(x.cur) })
+    ]);
+  }
+
+  // 电脑版：10 列表格（球号 / 当前遗漏 / 近30期4项 / 全历史4项）
+  function historyTableWide(rows) {
     const tbody = C.el('tbody');
     rows.forEach(function (x) {
       tbody.appendChild(C.el('tr', {}, [
         C.el('td', {}, [C.el('span', { class: 'ball-badge', text: String(x.d) })]),
-        C.el('td', { class: 'num' }, [
-          x.cur >= 30
-            ? C.el('span', { class: 'tag hot', text: String(x.cur) })
-            : C.el('span', { text: String(x.cur) })
-        ]),
+        curCell(x),
         C.el('td', { class: 'num', text: String(x.near.count) }),
         C.el('td', { class: 'num', text: isNaN(x.near.avgGap) ? '—' : C.fixed(x.near.avgGap, 1) }),
         C.el('td', { class: 'num', text: String(x.near.maxGap) }),
@@ -240,7 +248,69 @@
       ]),
       tbody
     ]);
+    return table;
+  }
 
+  /* 手机版：把 10 列拆成两张窄表，少列多行——不用横向滑动，
+     第一列（球号）也不会被滑出视野。 */
+  function historyTableNarrow(rows) {
+    function smallTable(caption, cols) {
+      const tbody = C.el('tbody');
+      rows.forEach(function (x) {
+        const tds = [];
+        cols.forEach(function (c) { tds.push(c.cell(x)); });
+        tbody.appendChild(C.el('tr', {}, tds));
+      });
+      return C.el('div', { style: 'margin-bottom:10px' }, [
+        C.el('div', {
+          style: 'font-size:12px;color:var(--ink-3);margin:0 0 4px 2px',
+          text: caption
+        }),
+        C.el('table', {}, [
+          C.el('thead', {}, [C.el('tr', {}, cols.map(function (c) {
+            return C.el('th', { text: c.name });
+          }))]),
+          tbody
+        ])
+      ]);
+    }
+    const ball = { name: '球号', cell: function (x) {
+      return C.el('td', {}, [C.el('span', { class: 'ball-badge', text: String(x.d) })]);
+    } };
+    const nearTable = smallTable('当前 / 近 30 期', [
+      ball,
+      { name: '当前遗漏', cell: curCell },
+      { name: '近30出现', cell: function (x) {
+        return C.el('td', { class: 'num', text: String(x.near.count) });
+      } },
+      { name: '近30最大遗漏', cell: function (x) {
+        return C.el('td', { class: 'num', text: String(x.near.maxGap) });
+      } }
+    ]);
+    const allTable = smallTable('全历史（' + C.comma(C.DRAWS.length) + ' 期）', [
+      ball,
+      { name: '出现', cell: function (x) {
+        return C.el('td', { class: 'num', text: String(x.all.count) });
+      } },
+      { name: '平均遗漏', cell: function (x) {
+        return C.el('td', { class: 'num',
+          text: isNaN(x.all.avgGap) ? '—' : C.fixed(x.all.avgGap, 1) });
+      } },
+      { name: '最大遗漏', cell: function (x) {
+        return C.el('td', { class: 'num', text: String(x.all.maxGap) });
+      } },
+      { name: '最大连出', cell: function (x) {
+        return C.el('td', { class: 'num', text: String(x.all.streak) });
+      } }
+    ]);
+    return C.el('div', {}, [nearTable, allTable, C.el('div', {
+      class: 'hint', style: 'margin:0 0 2px 2px',
+      text: '手机版把电脑版的 10 列总表拆成两张窄表，省得左右滑动。'
+    })]);
+  }
+
+  function historyBlock(pos, rows) {
+    const isNarrow = C.narrow();
     return C.el('div', {
       class: 'hist-block',
       style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
@@ -249,18 +319,20 @@
         style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
         text: POS_NAME[pos] + '历史数据'
       }),
-      C.tableScroll(table)
+      isNarrow ? historyTableNarrow(rows) : C.tableScroll(historyTableWide(rows))
     ]);
   }
 
-  const hsCache = {};
+  let hsNarrow = null;
   function renderHistory() {
     const box = C.$('#hs-tables');
     if (!box) return;
-    if (hsCache.done) return;
-    hsCache.done = true;
+    const isNarrow = C.narrow();
+    if (hsNarrow === isNarrow && box.childElementCount) return;
+    hsNarrow = isNarrow;
+    C.clear(box);
     const outer = C.el('div', { class: 'grid2' });
-    for (let p = 0; p < 3; p++) outer.appendChild(historyBlock(p));
+    for (let p = 0; p < 3; p++) outer.appendChild(historyBlock(p, histRows(p)));
     outer.appendChild(C.el('div', {
       style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
     }, [
@@ -299,5 +371,7 @@
       C.clear(C.$('#om-tables'));
       render();
     });
+    // 手机 ↔ 电脑时历史统计换排版（10 列总表 ↔ 两张窄表）
+    C.onNarrowChange(function () { renderHistory(); });
   });
 })();
