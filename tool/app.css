@@ -158,40 +158,42 @@ button.btn:disabled { opacity: .5; cursor: default; }
 
 .pad-title { font-size: 12.5px; color: var(--ink-2); }
 
-/* 一键清空：比数字键大约一倍，暖橙色，一眼区分 */
+/* 一键清空：排在数字键之后，与数字键同高，暖橙色一眼区分 */
 .clear-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  min-width: 104px;
-  padding: 14px 22px;
+  gap: 5px;
+  margin-left: 8px;         /* 与数字键之间留出间隔，读作"另一个动作" */
+  min-width: 84px;
+  padding: 8px 14px;
   white-space: nowrap;      /* 不允许文字换行成"✕ 清 / 空" */
-  flex: 0 0 auto;           /* 不参与拉伸，保持本身尺寸 */
+  flex: 0 0 auto;           /* 不参与拉伸，按内容定宽 */
+  align-self: stretch;      /* 高度跟随本行数字键 */
   font-family: inherit;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: .5px;
   color: #9a3412;
   background: linear-gradient(180deg, #fff8ef 0%, #ffe9cf 100%);
   border: 1px solid #f3b872;
-  border-radius: 9px;
+  border-radius: 8px;
   cursor: pointer;
   box-shadow:
     inset 0 1px 0 #fff,
-    0 3px 0 #eec38a,
-    0 5px 10px rgba(154, 52, 18, .13);
+    0 2px 0 #eec38a,
+    0 3px 6px rgba(154, 52, 18, .12);
   transition: background .12s ease, box-shadow .12s ease, transform .08s ease;
 }
 
 .clear-btn:hover {
   background: linear-gradient(180deg, #fffdf8 0%, #ffe0b8 100%);
-  box-shadow: inset 0 1px 0 #fff, 0 3px 0 #e6b678, 0 6px 13px rgba(154, 52, 18, .18);
+  box-shadow: inset 0 1px 0 #fff, 0 2px 0 #e6b678, 0 4px 9px rgba(154, 52, 18, .18);
 }
 
 .clear-btn:active {
-  transform: translateY(3px);
-  box-shadow: inset 0 2px 6px rgba(154, 52, 18, .22), 0 0 0 #eec38a;
+  transform: translateY(2px);
+  box-shadow: inset 0 2px 5px rgba(154, 52, 18, .22), 0 0 0 #eec38a;
 }
 
 .clear-btn:disabled {
@@ -518,7 +520,8 @@ footer.end {
     #pk-pos button.digit-btn, #pk-group button.digit-btn { flex: 1 1 17%; min-width: 44px; }
     .digit-btn { padding: 10px 0; font-size: 16px; }
 
-    /* 清除按钮保持与桌面同尺寸：窄屏下实测仍放得下一行（标签+按钮约 244px < 342px） */
+    /* 清除按钮跟随数字键高度，字号略增 */
+    .clear-btn { padding: 10px 12px; font-size: 14px; min-width: 76px; }
 
   /* 统计卡片两列 */
   .stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }

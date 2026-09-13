@@ -117,8 +117,11 @@
   function money(x) { return C.comma(Math.round(x)) + ' 元'; }
 
   // ---------- 界面构建 ----------
-  function digitPad(selected, onToggle, cls) {
-    const wrap = C.el('div', { style: 'display:flex;gap:6px;flex-wrap:wrap' });
+  // clearSet 传进来时，清空按钮会作为最后一个元素排在数字之后
+  function digitPad(selected, onToggle, cls, clearSet) {
+    const wrap = C.el('div', {
+      style: 'display:flex;gap:6px;flex-wrap:wrap;align-items:stretch'
+    });
     for (let d = 0; d <= 9; d++) {
       const on = selected.has(d);
       wrap.appendChild(C.el('button', {
@@ -132,6 +135,7 @@
         })(d)
       }));
     }
+    if (clearSet) wrap.appendChild(clearButton(clearSet, clearSet.size));
     return wrap;
   }
 
@@ -214,14 +218,14 @@
     box.appendChild(grid);
 
     // 胆码也是"选数字"的分组，同样给一个一键清空
-    box.appendChild(C.el('div', { class: 'pad-head', style: 'margin-top:14px' }, [
+    box.appendChild(C.el('div', { class: 'filter-item', style: 'margin-top:14px' }, [
+      C.el('span', { class: 'fl', text: '胆码' }),
       C.el('span', {
-        class: 'pad-title',
-        text: '胆码  （号码必须包含选中的每一个数字）'
-      }),
-      clearButton(danSel, danSel.size)
+        style: 'color:var(--ink-3);font-size:12px',
+        text: '（号码必须包含选中的每一个数字）'
+      })
     ]));
-    box.appendChild(digitPad(danSel, refresh, 'chip-btn'));
+    box.appendChild(digitPad(danSel, refresh, 'chip-btn', danSel));
 
     if (hasAnyFilter()) {
       box.appendChild(C.el('div', { style: 'margin-top:10px' }, [
@@ -242,27 +246,21 @@
     C.clear(posBox);
     for (let p = 0; p < 3; p++) {
       posBox.appendChild(C.el('div', { style: 'margin:10px 0' }, [
-        C.el('div', { class: 'pad-head' }, [
-          C.el('span', {
-            class: 'pad-title',
-            text: POS_NAME[p] + '（已选 ' + posSel[p].size + ' 个）'
-          }),
-          clearButton(posSel[p], posSel[p].size)
-        ]),
-        digitPad(posSel[p], refresh)
+        C.el('div', {
+          style: 'font-size:12.5px;color:var(--ink-2);margin-bottom:5px',
+          text: POS_NAME[p] + '（已选 ' + posSel[p].size + ' 个）'
+        }),
+        digitPad(posSel[p], refresh, null, posSel[p])
       ]));
     }
 
     const grpBox = C.$('#pk-group');
     C.clear(grpBox);
-    grpBox.appendChild(C.el('div', { class: 'pad-head' }, [
-      C.el('span', {
-        class: 'pad-title',
-        text: '选中若干数字（已选 ' + grpSel.size + ' 个），自动展开为组选六 / 组选三组合'
-      }),
-      clearButton(grpSel, grpSel.size)
-    ]));
-    grpBox.appendChild(digitPad(grpSel, refresh));
+    grpBox.appendChild(C.el('div', {
+      style: 'font-size:12.5px;color:var(--ink-3);margin-bottom:5px',
+      text: '选中若干数字（已选 ' + grpSel.size + ' 个），自动展开为组选六 / 组选三组合'
+    }));
+    grpBox.appendChild(digitPad(grpSel, refresh, null, grpSel));
   }
 
   function refresh() {
