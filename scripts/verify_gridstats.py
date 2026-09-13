@@ -10,6 +10,7 @@ verify_logic.js 第 7 节把这些数字硬编码成断言，页面每次构建�
 """
 
 import json
+from math import comb
 from pathlib import Path
 
 def find_dataset():
@@ -160,3 +161,42 @@ print()
 print("对撞用的关键值（verify_logic.js 第 8 节）：")
 print("  不分位数字1:", any_rows[1])
 print("  不分位数字5:", any_rows[5])
+
+# ---------------- 任意 N 期窗口：会不会出现重号 ----------------
+# 理论：马尔可夫链精确算（状态只需"本期有几个不同数字"）
+def g(m, j):
+    """m 个数字里取 3 位、恰好 j 个不同数字的组合数"""
+    if j == 1:
+        return m
+    if j == 2:
+        return comb(m, 2) * 6
+    return comb(m, 3) * 6
+
+
+def no_repeat_window(n):
+    w = {1: g(10, 1) / 1000, 2: g(10, 2) / 1000, 3: g(10, 3) / 1000}
+    for _ in range(n - 1):
+        nw = {1: 0.0, 2: 0.0, 3: 0.0}
+        for k, p in w.items():
+            for j in (1, 2, 3):
+                nw[j] += p * g(10 - k, j) / 1000
+        w = nw
+    return sum(w.values())
+
+
+print()
+print("=== 任意 N 期窗口（有重号的概率）===")
+print("  窗口   无重号(理论)     无重号(实测窗口)         有重号(实测)")
+for n in (5, 10, 20, 30):
+    tot = clean = 0
+    for i in range(N - n + 1):
+        tot += 1
+        if all(not (SETS[i + j] & SETS[i + j - 1]) for j in range(1, n)):
+            clean += 1
+    theo = no_repeat_window(n)
+    print(f"  {n:>3} 期   {theo * 100:8.4f}%     {clean:>4} / {tot:<5} ({clean / tot * 100:6.4f}%)   "
+          f"{(1 - clean / tot) * 100:6.2f}%")
+print("对撞用的关键值（verify_logic.js 第 8 节）：")
+print("  2 期无重号 =", f"{no_repeat_window(2) * 100:.4f}%",
+      " 5 期 =", f"{no_repeat_window(5) * 100:.4f}%",
+      " 10 期 =", f"{no_repeat_window(10) * 100:.4f}%")

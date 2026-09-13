@@ -62,6 +62,32 @@
       return { dist: dist, mean: mean, onePlus: 1 - dist[0] };
     })();
 
+    /* 在 m 个数字里取 3 位（可重复）、恰好出现 j 个不同数字的组合数 */
+    function triplesByDistinct(m) {
+      return [0,
+        m,                                    // j=1：aaa
+        (m * (m - 1) / 2) * 6,                // j=2：aab 的 6 种排列
+        (m * (m - 1) * (m - 2) / 6) * 6];     // j=3：abc 的 6 种排列
+    }
+
+    /* 连续 n 期"一次相邻重号都没有"的概率（精确，不是模拟）。
+       马尔可夫链的状态只需要"本期有几个不同数字"：因为"下一期与本期不重叠"
+       的概率只取决于 10 减去本期的不同数字个数，而不取决于具体是哪几个数字。 */
+    function noRepeatWindow(n) {
+      const init = triplesByDistinct(10);
+      let w = [0, init[1] / 1000, init[2] / 1000, init[3] / 1000];
+      for (let step = 1; step < n; step++) {
+        const nw = [0, 0, 0, 0];
+        for (let k = 1; k <= 3; k++) {
+          if (!w[k]) continue;
+          const g = triplesByDistinct(10 - k);
+          for (let j = 1; j <= 3; j++) nw[j] += w[k] * g[j] / 1000;
+        }
+        w = nw;
+      }
+      return w[1] + w[2] + w[3];
+    }
+
     return {
       sum: sum, span: span, type: type, posDigit: posDigit,
       sumTop3: sumTop3, spanTop3: spanTop3,
@@ -71,7 +97,9 @@
       spanTop3Rate: spanTop3.reduce(function (s, i) { return s + span[i]; }, 0) / 1000,
       typeTop1Rate: Math.max(type['豹子'], type['组三'], type['组六']) / 1000,
       groupTop20Rate: 20 / 220,
-      overlap: overlap
+      overlap: overlap,
+      triplesByDistinct: triplesByDistinct,
+      noRepeatWindow: noRepeatWindow
     };
   })();
 

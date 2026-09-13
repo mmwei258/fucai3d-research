@@ -386,6 +386,63 @@
               '原因：单个数字出现在任意位置的概率是 ' +
               C.pct(1 - Math.pow(0.9, 3), 1) + '（三位都不是它的概率 0.9³ = 72.9%），' +
               '所以 10 个数字里平均就有 0.73 个会连着两期都出现。'
+      }),
+      windowTable()
+    ]);
+  }
+
+  /* 换个问法：在"任意 N 期"这样的窗口里，会不会出现重号？
+     理论值由 THEORY.noRepeatWindow 精确算出（马尔可夫链，不是模拟）。 */
+  const OVERLAP_WINDOWS = [5, 10, 20, 30];
+  function windowTable() {
+    const D = C.DRAWS;
+    const sets = D.map(function (r) { return new Set(r.d); });
+    const tbody = C.el('tbody');
+    OVERLAP_WINDOWS.forEach(function (n) {
+      let total = 0, clean = 0;              // clean = 一次重号都没有的窗口
+      for (let i = 0; i + n <= D.length; i++) {
+        total++;
+        let has = false;
+        for (let j = 1; j < n && !has; j++) {
+          sets[i + j].forEach(function (d) { if (sets[i + j - 1].has(d)) has = true; });
+        }
+        if (!has) clean++;
+      }
+      const noiseFree = C.THEORY.noRepeatWindow(n);
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', { text: n + ' 期' }),
+        C.el('td', { class: 'num', text: C.comma(clean) + ' / ' + C.comma(total) }),
+        C.el('td', { class: 'num', text: C.pct(1 - clean / total) }),
+        C.el('td', { class: 'num', text: noiseFree < 0.0001 ? '≈100%' : C.pct(1 - noiseFree) })
+      ]));
+    });
+
+    const t = C.el('table', {}, [
+      C.el('thead', {}, [C.el('tr', {}, [
+        C.el('th', { text: '窗口' }),
+        C.el('th', { text: '一次重号都没有的窗口' }),
+        C.el('th', { text: '出现过重号（实测）' }),
+        C.el('th', { text: '出现过重号（理论）' })
+      ])]),
+      tbody
+    ]);
+
+    const p = 1 - Math.pow(0.9, 3);
+    return C.el('div', { style: 'margin-top:14px' }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
+        text: '换个问法：任意 N 期里，会不会出现"跟上期重复的数字"？'
+      }),
+      C.tableScroll(t),
+      C.el('div', {
+        class: 'hint', style: 'margin-top:10px',
+        html: '<b>10 期窗口里一次重号都没有，理论概率只有 ' +
+              C.pct(C.THEORY.noRepeatWindow(10), 2) + '</b>——我们 4,741 个 10 期窗口里' +
+              '一个都没出现过。所以"看到重号"根本不说明什么，它几乎必然出现。<br>' +
+              '再换个问法：<b>某一个数字</b>（不分位）单期出现的概率是 ' + C.pct(p, 2) +
+              '，连着出现 2 期是 ' + C.pct(p * p, 2) + '，3 期是 ' + C.pct(p * p * p, 2) +
+              '，4 期是 ' + C.pct(Math.pow(p, 4), 2) + '，5 期是 ' + C.pct(Math.pow(p, 5), 3) +
+              '：连出越长越罕见——那才是"不随机"才可能出现的东西。'
       })
     ]);
   }
