@@ -141,6 +141,7 @@
     if (statsCache[key]) {
       C.clear(C.$('#om-tables'));
       C.$('#om-tables').appendChild(statsCache[key]);
+      renderHistory();
       return;
     }
 
@@ -156,9 +157,137 @@
     C.clear(C.$('#om-tables'));
     C.$('#om-tables').appendChild(outer);
     statsCache[key] = outer;
+    renderHistory();
   }
 
-  window.OMISSION = { render: render };
+  /* ---------------- 历史统计：近 30 期 vs 全历史 ---------------- */
+  // 当前遗漏：与「遗漏统计」页同一口径（0 = 上一期刚出过）
+  function currentGap(pos, d) {
+    const D = C.DRAWS;
+    for (let i = D.length - 1; i >= 0; i--) {
+      if (D[i].d[pos] === d) return D.length - 1 - i;
+    }
+    return D.length;
+  }
+
+  // 某窗口内、某位某数字的四项统计。serAll 是整段历史的遗漏序列（每位只算一次，10 个数字复用）
+  function windowStats(pos, d, from, serAll) {
+    const win = C.DRAWS.slice(from);
+    const hits = win.map(function (r) { return r.d[pos] === d; });
+    const count = hits.filter(Boolean).length;
+    let maxGap = 0;
+    win.forEach(function (r, i) { maxGap = Math.max(maxGap, C.gapOf(serAll[from + i], d)); });
+    return {
+      count: count,
+      avgGap: count ? win.length / count : NaN,
+      maxGap: maxGap,
+      streak: C.maxStreak(win, hits)
+    };
+  }
+
+  function historyBlock(pos) {
+    const D = C.DRAWS;
+    const from30 = Math.max(0, D.length - 30);
+    const serAll = C.gapSeries(D, C.keyOfPos(pos), 0);
+    const rows = [];
+    for (let d = 0; d <= 9; d++) {
+      rows.push({
+        d: d,
+        cur: currentGap(pos, d),
+        near: windowStats(pos, d, from30, serAll),
+        all: windowStats(pos, d, 0, serAll)
+      });
+    }
+
+    const tbody = C.el('tbody');
+    rows.forEach(function (x) {
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', {}, [C.el('span', { class: 'ball-badge', text: String(x.d) })]),
+        C.el('td', { class: 'num' }, [
+          x.cur >= 30
+            ? C.el('span', { class: 'tag hot', text: String(x.cur) })
+            : C.el('span', { text: String(x.cur) })
+        ]),
+        C.el('td', { class: 'num', text: String(x.near.count) }),
+        C.el('td', { class: 'num', text: isNaN(x.near.avgGap) ? '—' : C.fixed(x.near.avgGap, 1) }),
+        C.el('td', { class: 'num', text: String(x.near.maxGap) }),
+        C.el('td', { class: 'num', text: String(x.near.streak) }),
+        C.el('td', { class: 'num', text: String(x.all.count) }),
+        C.el('td', { class: 'num', text: isNaN(x.all.avgGap) ? '—' : C.fixed(x.all.avgGap, 1) }),
+        C.el('td', { class: 'num', text: String(x.all.maxGap) }),
+        C.el('td', { class: 'num', text: String(x.all.streak) })
+      ]));
+    });
+
+    const table = C.el('table', {}, [
+      C.el('thead', {}, [
+        C.el('tr', {}, [
+          C.el('th', { rowspan: '2', text: '球号' }),
+          C.el('th', { rowspan: '2', text: '当前遗漏' }),
+          C.el('th', { colspan: '4', text: '近 30 期' }),
+          C.el('th', { colspan: '4', text: '全历史（' + C.comma(C.DRAWS.length) + ' 期）' })
+        ]),
+        C.el('tr', {}, [
+          C.el('th', { text: '出现' }),
+          C.el('th', { text: '平均遗漏' }),
+          C.el('th', { text: '最大遗漏' }),
+          C.el('th', { text: '最大连出' }),
+          C.el('th', { text: '出现' }),
+          C.el('th', { text: '平均遗漏' }),
+          C.el('th', { text: '最大遗漏' }),
+          C.el('th', { text: '最大连出' })
+        ])
+      ]),
+      tbody
+    ]);
+
+    return C.el('div', {
+      class: 'hist-block',
+      style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
+    }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
+        text: POS_NAME[pos] + '历史数据'
+      }),
+      C.tableScroll(table)
+    ]);
+  }
+
+  const hsCache = {};
+  function renderHistory() {
+    const box = C.$('#hs-tables');
+    if (!box) return;
+    if (hsCache.done) return;
+    hsCache.done = true;
+    const outer = C.el('div', { class: 'grid2' });
+    for (let p = 0; p < 3; p++) outer.appendChild(historyBlock(p));
+    outer.appendChild(C.el('div', {
+      style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
+    }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:8px;color:var(--ink-2)',
+        text: '怎么读这张表'
+      }),
+      C.el('div', { style: 'font-size:12.5px;color:var(--ink-2)' }, [
+        C.el('div', { text: '· 平均遗漏：理论值恒为 10.0 期（每位每数字出现概率都是 1/10）。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 最大遗漏：这个数字在该位置"最长一次连续多少期没出现"。全历史里出现 50~80 期都属正常。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 最大连出：连续多少期都出现（理论上连出 2 期的概率 1%，3 期 0.1%）。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 近 30 期出现 0~6 次都是随机正常范围；短窗口里"偏热偏冷"是必然现象，不是信号。' })
+      ])
+    ]));
+    box.appendChild(outer);
+  }
+
+  window.OMISSION = {
+    render: render,
+    _windowStats: function (pos, d, from) {
+      return windowStats(pos, d, from, C.gapSeries(C.DRAWS, C.keyOfPos(pos), 0));
+    },
+    _currentGap: currentGap
+  };
 
   document.addEventListener('DOMContentLoaded', function () {
     const sel = document.getElementById('om-window');

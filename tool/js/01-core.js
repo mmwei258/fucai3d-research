@@ -107,10 +107,58 @@
     return c;
   }
 
+  // ---------- 逐期遗漏序列（走势网格 / 开奖记录 / 历史统计共用）----------
+  /* keysOf(row) 返回该期"命中的键"（可以是多个）。
+     返回数组的第 i 项对应 rows[from + i] 这一期【开奖之前】的状态：
+       { i: 绝对期序, last: { 键 -> 上次出现的期序 } }
+     用 gapOf 取某个键当时已经连续多少期没出现。
+     注意：last 会先用 from 之前的历史预热，所以窗口第一行的遗漏值也是真实值，
+     而不是从 0 开始——否则跨窗口看同一张表会对不上。 */
+  const digitKeys = function (row) { return row.d; };
+  const keyOfPos = function (pos) {
+    return function (row) { return [row.d[pos]]; };
+  };
+  const keyOfType = function (row) { return [row.type]; };
+
+  function gapSeries(rows, keysOf, from) {
+    const last = Object.create(null);
+    const see = function (i) {
+      keysOf(rows[i]).forEach(function (k) { last[k] = i; });
+    };
+    const start = from || 0;
+    for (let i = 0; i < start; i++) see(i);
+    const out = [];
+    for (let i = start; i < rows.length; i++) {
+      const snapshot = Object.create(null);
+      Object.keys(last).forEach(function (k) { snapshot[k] = last[k]; });
+      out.push({ i: i, last: snapshot });
+      see(i);
+    }
+    return out;
+  }
+
+  // 某键在这期之前已经多少期没出现（0 = 上一期刚出过；从未出现 = 已经过了 i 期）
+  function gapOf(rec, key) {
+    const v = rec.last[key];
+    return v === undefined ? rec.i : rec.i - v - 1;
+  }
+
+  // 某键的"最大连出"：连续多少期都有它（窗口内统计）
+  function maxStreak(rows, hits) {
+    let best = 0, cur = 0;
+    for (let i = 0; i < rows.length; i++) {
+      if (hits[i]) { cur++; if (cur > best) best = cur; }
+      else cur = 0;
+    }
+    return best;
+  }
+
   // ---------- 标签页 ----------
   const TABS = [
     { id: 'overview', label: '概览', panel: 'p-overview', render: function () { window.OV.render(); } },
-    { id: 'trend', label: '走势图', panel: 'p-trend', render: function () { window.TREND.render(); } },
+    { id: 'drawlog', label: '开奖记录', panel: 'p-drawlog', render: function () { window.DRAWLOG.render(); } },
+    { id: 'trend', label: '走势图', panel: 'p-trend',
+      render: function () { window.TREND.render(); window.GRID.render(); } },
     { id: 'omission', label: '遗漏统计', panel: 'p-omission', render: function () { window.OMISSION.render(); } },
     { id: 'freq', label: '频率分布', panel: 'p-freq', render: function () { window.FREQ.render(); } },
     { id: 'picker', label: '选号器', panel: 'p-picker', render: function () { window.PICKER.render(); } },
@@ -155,6 +203,8 @@
     pct: pct, fixed: fixed, comma: comma,
     sliceWindow: sliceWindow,
     posCounts: posCounts,
+    gapSeries: gapSeries, gapOf: gapOf, maxStreak: maxStreak,
+    digitKeys: digitKeys, keyOfPos: keyOfPos, keyOfType: keyOfType,
     buildTabs: buildTabs,
     show: show
   };

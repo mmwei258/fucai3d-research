@@ -587,6 +587,39 @@ footer.end {
 
 .hidden { display: none !important; }
 
+/* 历史统计表：10 列要塞进双栏卡片里，字号和内边距都要收一点 */
+.hist-block table { font-size: 12px; }
+.hist-block th, .hist-block td { padding: 3px 5px; }
+
+/* ---------- 开奖记录 / 历史统计 ---------- */
+/* 组态色块：命中的那一栏（参考站的做法，一眼看出当期是组三/组六/豹子） */
+.type-block {
+  display: inline-block;
+  min-width: 46px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.draw-num { color: #c0392b; font-weight: 600; letter-spacing: 1px; }
+
+/* 球号徽标（历史统计表第一列） */
+.ball-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e2e8f2;
+  color: #3d4c60;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 /* ---------- 保存当期清单 ---------- */
 .save-box {
   margin-top: 18px;
@@ -682,6 +715,33 @@ footer.end {
     </div>
   </section>
 
+  <!-- ========== 开奖记录 ========== -->
+  <section class="panel hidden" id="p-drawlog">
+    <div class="card">
+      <h2>开奖记录（带组态遗漏）</h2>
+      <p class="hint">
+        每期开出的是豹子 / 组三 / 组六 中的一种：<b>命中的那一栏用色块标出</b>，
+        另外两栏显示"距上次出现已经过多少期"（0 = 上一期刚出过）。
+        组态占比由规则决定（组六约 72%、组三约 27%、豹子约 1%），
+        不存在"该轮到谁了"这回事。
+        <br><b>口径</b>：本表 0 = 上一期刚出过；有些站点把这种情况记作 1，读表时注意差 1 期。
+      </p>
+      <div class="row">
+        <label>显示期数
+          <select id="dl-n">
+            <option value="30" selected>最近 30 期</option>
+            <option value="50">最近 50 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="200">最近 200 期</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="dl-gap" checked> 显示遗漏数字</label>
+      </div>
+      <div id="dl-table" style="margin-top:14px"></div>
+      <div class="legend" id="dl-legend"></div>
+    </div>
+  </section>
+
   <!-- ========== 走势图 ========== -->
   <section class="panel hidden" id="p-trend">
     <div class="card">
@@ -707,6 +767,35 @@ footer.end {
       <div class="chart-scroll" id="tr-sum"></div>
       <div class="chart-scroll" id="tr-span" style="margin-top:12px"></div>
     </div>
+
+    <div class="card">
+      <h2>遗漏网格（走势表）</h2>
+      <p class="hint">
+        每行一期，10 列是 0~9。<b>格子里的数字 = 该数字在这个位置上已经连续多少期没出现</b>
+        （0 = 上一期刚出过）；<b>被圈起来的格子就是当期开出的数字</b>，连线是它逐期的轨迹。
+        「不分位」把三个位置合起来看：一期开出 3 个数字，三个位置都会标圈。
+      </p>
+      <div class="row">
+        <label>位置
+          <select id="tg-pos">
+            <option value="0" selected>百位（第一位）</option>
+            <option value="1">十位（第二位）</option>
+            <option value="2">个位（第三位）</option>
+            <option value="3">不分位（三位一起看）</option>
+          </select>
+        </label>
+        <label>显示期数
+          <select id="tg-n">
+            <option value="30" selected>最近 30 期</option>
+            <option value="50">最近 50 期</option>
+            <option value="100">最近 100 期</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="tg-line" checked> 显示连线</label>
+      </div>
+      <div class="chart-scroll" id="tg-chart"></div>
+      <div class="legend" id="tg-legend"></div>
+    </div>
   </section>
 
   <!-- ========== 遗漏 ========== -->
@@ -729,6 +818,16 @@ footer.end {
         <button class="btn ghost" id="om-sort">按当前遗漏排序</button>
       </div>
       <div id="om-tables" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <h2>历史统计（近 30 期 / 全历史对照）</h2>
+      <p class="hint">
+        每位每数字的长时间统计：出现次数、平均遗漏、最大遗漏、最大连出。
+        「近 30 期」这一栏用小窗口，是为了让你看清"最近偏热/偏冷"这类说法在短窗口里
+        其实年年都会出现——它和全历史放在一起对比，差别一眼可见。
+      </p>
+      <div id="hs-tables" style="margin-top:14px"></div>
     </div>
   </section>
 
@@ -1009,10 +1108,58 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     return c;
   }
 
+  // ---------- 逐期遗漏序列（走势网格 / 开奖记录 / 历史统计共用）----------
+  /* keysOf(row) 返回该期"命中的键"（可以是多个）。
+     返回数组的第 i 项对应 rows[from + i] 这一期【开奖之前】的状态：
+       { i: 绝对期序, last: { 键 -> 上次出现的期序 } }
+     用 gapOf 取某个键当时已经连续多少期没出现。
+     注意：last 会先用 from 之前的历史预热，所以窗口第一行的遗漏值也是真实值，
+     而不是从 0 开始——否则跨窗口看同一张表会对不上。 */
+  const digitKeys = function (row) { return row.d; };
+  const keyOfPos = function (pos) {
+    return function (row) { return [row.d[pos]]; };
+  };
+  const keyOfType = function (row) { return [row.type]; };
+
+  function gapSeries(rows, keysOf, from) {
+    const last = Object.create(null);
+    const see = function (i) {
+      keysOf(rows[i]).forEach(function (k) { last[k] = i; });
+    };
+    const start = from || 0;
+    for (let i = 0; i < start; i++) see(i);
+    const out = [];
+    for (let i = start; i < rows.length; i++) {
+      const snapshot = Object.create(null);
+      Object.keys(last).forEach(function (k) { snapshot[k] = last[k]; });
+      out.push({ i: i, last: snapshot });
+      see(i);
+    }
+    return out;
+  }
+
+  // 某键在这期之前已经多少期没出现（0 = 上一期刚出过；从未出现 = 已经过了 i 期）
+  function gapOf(rec, key) {
+    const v = rec.last[key];
+    return v === undefined ? rec.i : rec.i - v - 1;
+  }
+
+  // 某键的"最大连出"：连续多少期都有它（窗口内统计）
+  function maxStreak(rows, hits) {
+    let best = 0, cur = 0;
+    for (let i = 0; i < rows.length; i++) {
+      if (hits[i]) { cur++; if (cur > best) best = cur; }
+      else cur = 0;
+    }
+    return best;
+  }
+
   // ---------- 标签页 ----------
   const TABS = [
     { id: 'overview', label: '概览', panel: 'p-overview', render: function () { window.OV.render(); } },
-    { id: 'trend', label: '走势图', panel: 'p-trend', render: function () { window.TREND.render(); } },
+    { id: 'drawlog', label: '开奖记录', panel: 'p-drawlog', render: function () { window.DRAWLOG.render(); } },
+    { id: 'trend', label: '走势图', panel: 'p-trend',
+      render: function () { window.TREND.render(); window.GRID.render(); } },
     { id: 'omission', label: '遗漏统计', panel: 'p-omission', render: function () { window.OMISSION.render(); } },
     { id: 'freq', label: '频率分布', panel: 'p-freq', render: function () { window.FREQ.render(); } },
     { id: 'picker', label: '选号器', panel: 'p-picker', render: function () { window.PICKER.render(); } },
@@ -1057,6 +1204,8 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     pct: pct, fixed: fixed, comma: comma,
     sliceWindow: sliceWindow,
     posCounts: posCounts,
+    gapSeries: gapSeries, gapOf: gapOf, maxStreak: maxStreak,
+    digitKeys: digitKeys, keyOfPos: keyOfPos, keyOfType: keyOfType,
     buildTabs: buildTabs,
     show: show
   };
@@ -1487,6 +1636,7 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     if (statsCache[key]) {
       C.clear(C.$('#om-tables'));
       C.$('#om-tables').appendChild(statsCache[key]);
+      renderHistory();
       return;
     }
 
@@ -1502,9 +1652,137 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     C.clear(C.$('#om-tables'));
     C.$('#om-tables').appendChild(outer);
     statsCache[key] = outer;
+    renderHistory();
   }
 
-  window.OMISSION = { render: render };
+  /* ---------------- 历史统计：近 30 期 vs 全历史 ---------------- */
+  // 当前遗漏：与「遗漏统计」页同一口径（0 = 上一期刚出过）
+  function currentGap(pos, d) {
+    const D = C.DRAWS;
+    for (let i = D.length - 1; i >= 0; i--) {
+      if (D[i].d[pos] === d) return D.length - 1 - i;
+    }
+    return D.length;
+  }
+
+  // 某窗口内、某位某数字的四项统计。serAll 是整段历史的遗漏序列（每位只算一次，10 个数字复用）
+  function windowStats(pos, d, from, serAll) {
+    const win = C.DRAWS.slice(from);
+    const hits = win.map(function (r) { return r.d[pos] === d; });
+    const count = hits.filter(Boolean).length;
+    let maxGap = 0;
+    win.forEach(function (r, i) { maxGap = Math.max(maxGap, C.gapOf(serAll[from + i], d)); });
+    return {
+      count: count,
+      avgGap: count ? win.length / count : NaN,
+      maxGap: maxGap,
+      streak: C.maxStreak(win, hits)
+    };
+  }
+
+  function historyBlock(pos) {
+    const D = C.DRAWS;
+    const from30 = Math.max(0, D.length - 30);
+    const serAll = C.gapSeries(D, C.keyOfPos(pos), 0);
+    const rows = [];
+    for (let d = 0; d <= 9; d++) {
+      rows.push({
+        d: d,
+        cur: currentGap(pos, d),
+        near: windowStats(pos, d, from30, serAll),
+        all: windowStats(pos, d, 0, serAll)
+      });
+    }
+
+    const tbody = C.el('tbody');
+    rows.forEach(function (x) {
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', {}, [C.el('span', { class: 'ball-badge', text: String(x.d) })]),
+        C.el('td', { class: 'num' }, [
+          x.cur >= 30
+            ? C.el('span', { class: 'tag hot', text: String(x.cur) })
+            : C.el('span', { text: String(x.cur) })
+        ]),
+        C.el('td', { class: 'num', text: String(x.near.count) }),
+        C.el('td', { class: 'num', text: isNaN(x.near.avgGap) ? '—' : C.fixed(x.near.avgGap, 1) }),
+        C.el('td', { class: 'num', text: String(x.near.maxGap) }),
+        C.el('td', { class: 'num', text: String(x.near.streak) }),
+        C.el('td', { class: 'num', text: String(x.all.count) }),
+        C.el('td', { class: 'num', text: isNaN(x.all.avgGap) ? '—' : C.fixed(x.all.avgGap, 1) }),
+        C.el('td', { class: 'num', text: String(x.all.maxGap) }),
+        C.el('td', { class: 'num', text: String(x.all.streak) })
+      ]));
+    });
+
+    const table = C.el('table', {}, [
+      C.el('thead', {}, [
+        C.el('tr', {}, [
+          C.el('th', { rowspan: '2', text: '球号' }),
+          C.el('th', { rowspan: '2', text: '当前遗漏' }),
+          C.el('th', { colspan: '4', text: '近 30 期' }),
+          C.el('th', { colspan: '4', text: '全历史（' + C.comma(C.DRAWS.length) + ' 期）' })
+        ]),
+        C.el('tr', {}, [
+          C.el('th', { text: '出现' }),
+          C.el('th', { text: '平均遗漏' }),
+          C.el('th', { text: '最大遗漏' }),
+          C.el('th', { text: '最大连出' }),
+          C.el('th', { text: '出现' }),
+          C.el('th', { text: '平均遗漏' }),
+          C.el('th', { text: '最大遗漏' }),
+          C.el('th', { text: '最大连出' })
+        ])
+      ]),
+      tbody
+    ]);
+
+    return C.el('div', {
+      class: 'hist-block',
+      style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
+    }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:6px;color:var(--ink-2)',
+        text: POS_NAME[pos] + '历史数据'
+      }),
+      C.tableScroll(table)
+    ]);
+  }
+
+  const hsCache = {};
+  function renderHistory() {
+    const box = C.$('#hs-tables');
+    if (!box) return;
+    if (hsCache.done) return;
+    hsCache.done = true;
+    const outer = C.el('div', { class: 'grid2' });
+    for (let p = 0; p < 3; p++) outer.appendChild(historyBlock(p));
+    outer.appendChild(C.el('div', {
+      style: 'border:1px solid var(--line);border-radius:8px;padding:10px 12px'
+    }, [
+      C.el('div', {
+        style: 'font-weight:600;margin-bottom:8px;color:var(--ink-2)',
+        text: '怎么读这张表'
+      }),
+      C.el('div', { style: 'font-size:12.5px;color:var(--ink-2)' }, [
+        C.el('div', { text: '· 平均遗漏：理论值恒为 10.0 期（每位每数字出现概率都是 1/10）。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 最大遗漏：这个数字在该位置"最长一次连续多少期没出现"。全历史里出现 50~80 期都属正常。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 最大连出：连续多少期都出现（理论上连出 2 期的概率 1%，3 期 0.1%）。' }),
+        C.el('div', { style: 'margin-top:6px',
+          text: '· 近 30 期出现 0~6 次都是随机正常范围；短窗口里"偏热偏冷"是必然现象，不是信号。' })
+      ])
+    ]));
+    box.appendChild(outer);
+  }
+
+  window.OMISSION = {
+    render: render,
+    _windowStats: function (pos, d, from) {
+      return windowStats(pos, d, from, C.gapSeries(C.DRAWS, C.keyOfPos(pos), 0));
+    },
+    _currentGap: currentGap
+  };
 
   document.addEventListener('DOMContentLoaded', function () {
     const sel = document.getElementById('om-window');
@@ -3067,6 +3345,228 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     render: render, _run: runBacktest, _strategies: STRATEGIES,
     _exclusion: runExclusion, _exclWindows: EXCL_WINDOWS
   };
+})();
+
+
+/* ================= 遗漏网格（走势表） + 开奖记录 =================
+   两张表的共同点：都把"已经多少期没出现"（遗漏）直接写进格子里，
+   命中的那一格用色块/圆圈标出来。口径与「遗漏统计」页一致：
+   0 = 上一期刚出过；从未出现过 = 已经过了这么多期。 */
+(function () {
+  'use strict';
+  const C = window.CORE;
+  const NS = 'http://www.w3.org/2000/svg';
+  const D = C.DRAWS;
+
+  const POS_NAME = ['百位（第一位）', '十位（第二位）', '个位（第三位）', '不分位'];
+  const GRID_COLOR = ['#2f6fd0', '#2f6fd0', '#2f6fd0', '#d64545'];
+  const TYPE_COLOR = { '组三': '#2f6fd0', '组六': '#5a9e2f', '豹子': '#d64545' };
+  const TYPE_ORDER = ['组三', '组六', '豹子'];
+
+  function s(tag, attrs) {
+    const n = document.createElementNS(NS, tag);
+    Object.keys(attrs || {}).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+    return n;
+  }
+
+  function svgText(x, y, str, opts) {
+    const o = opts || {};
+    const node = s('text', {
+      x: x, y: y, 'font-size': o.size || 11,
+      fill: o.fill || '#8b98a8', 'text-anchor': o.anchor || 'middle',
+      'font-family': 'inherit'
+    });
+    node.textContent = str;
+    return node;
+  }
+
+  /* ---------------- 走势网格 ---------------- */
+  const GW = 26, RH = 22, HEAD = 20, ISSUE_W = 56;
+
+  function gridChart(rows, from, posIdx, showLine) {
+    const isAny = posIdx === 3;
+    const keysOf = isAny ? C.digitKeys : C.keyOfPos(posIdx);
+    const series = C.gapSeries(D, keysOf, from);
+    const color = GRID_COLOR[posIdx];
+    const n = rows.length;
+    const w = ISSUE_W + 10 * GW;
+    const h = HEAD + n * RH + 6;
+    const svg = s('svg', { class: 'chart', width: w, height: h });
+    const cx = function (d) { return ISSUE_W + d * GW + GW / 2; };
+    const cy = function (i) { return HEAD + i * RH + RH / 2; };
+
+    // 表头
+    svg.appendChild(svgText(ISSUE_W / 2, HEAD - 6, '期次', { size: 10 }));
+    for (let d = 0; d <= 9; d++) {
+      svg.appendChild(svgText(cx(d), HEAD - 6, String(d), { size: 11, fill: '#5a6879' }));
+    }
+    svg.appendChild(s('line', {
+      x1: 0, y1: HEAD - 1, x2: w, y2: HEAD - 1, stroke: '#e3e8f0', 'stroke-width': 1
+    }));
+
+    // 每 10 期一条分隔线（方便数期数）
+    for (let i = 1; i < n; i++) {
+      if (i % 10 === 0) {
+        svg.appendChild(s('line', {
+          x1: 0, y1: cy(i) - RH / 2, x2: w, y2: cy(i) - RH / 2,
+          stroke: '#f0b27a', 'stroke-width': 1, opacity: 0.85
+        }));
+      }
+    }
+
+    const hits = [];                       // 每期命中的数字（不分位时有多个）
+    rows.forEach(function (r, i) {
+      svg.appendChild(svgText(ISSUE_W / 2, cy(i) + 3.5, r.issue, { size: 9.5, fill: '#6b7686' }));
+      const hit = keysOf(r);
+      hits.push(hit);
+      for (let d = 0; d <= 9; d++) {
+        const on = hit.indexOf(d) >= 0;
+        if (!on) {
+          svg.appendChild(svgText(cx(d), cy(i) + 3.5, String(C.gapOf(series[i], d)), { size: 10 }));
+        }
+      }
+    });
+
+    // 连线：按位 = 逐期串成一条折线；不分位 = 同一个数字的相邻两次出现相连
+    if (showLine) {
+      if (!isAny) {
+        const pts = rows.map(function (r, i) { return [cx(r.d[posIdx]), cy(i)]; });
+        svg.appendChild(s('polyline', {
+          points: pts.map(function (p) { return p.join(','); }).join(' '),
+          fill: 'none', stroke: color, 'stroke-width': 1.4, opacity: 0.45
+        }));
+      } else {
+        for (let d = 0; d <= 9; d++) {
+          let prev = null;
+          rows.forEach(function (r, i) {
+            if (r.d.indexOf(d) < 0) return;
+            if (prev !== null) {
+              svg.appendChild(s('line', {
+                x1: cx(d), y1: cy(prev), x2: cx(d), y2: cy(i),
+                stroke: color, 'stroke-width': 1.4, opacity: 0.45
+              }));
+            }
+            prev = i;
+          });
+        }
+      }
+    }
+
+    // 圆圈画在线之上
+    rows.forEach(function (r, i) {
+      hits[i].forEach(function (d) {
+        svg.appendChild(s('circle', {
+          cx: cx(d), cy: cy(i), r: 9, fill: color
+        }));
+        svg.appendChild(svgText(cx(d), cy(i) + 3.5, String(d), { size: 10, fill: '#fff' }));
+      });
+    });
+
+    return svg;
+  }
+
+  function renderGrid() {
+    const box = C.$('#tg-chart');
+    C.clear(box);
+    const posIdx = +C.$('#tg-pos').value;
+    const n = +C.$('#tg-n').value;
+    const showLine = C.$('#tg-line').checked;
+    const from = Math.max(0, D.length - n);
+    const rows = D.slice(from);
+
+    const head = C.el('div', {
+      style: 'font-size:12.5px;color:' + GRID_COLOR[posIdx] +
+             ';margin:2px 0 6px 6px;font-weight:600',
+      text: POS_NAME[posIdx] + '　最近 ' + rows.length + ' 期'
+    });
+    box.appendChild(head);
+    box.appendChild(gridChart(rows, from, posIdx, showLine));
+
+    C.clear(C.$('#tg-legend'));
+    C.$('#tg-legend').appendChild(C.el('div', {
+      html: '格子里的数字是<b>遗漏值</b>：截至该期开奖前，这个数字在这个位置上已经连续多少期没出现' +
+            '（0 = 上一期刚出过；有些站点把这种情况记作 1）。' +
+            (posIdx === 3
+              ? '「不分位」的连线表示<b>同一个数字</b>的相邻两次出现。'
+              : '连线表示每期开出数字的先后顺序。') +
+            '遗漏值大 ≠ 该出了：每期都是独立事件。'
+    }));
+  }
+
+  /* ---------------- 开奖记录 ---------------- */
+  function renderDrawLog() {
+    const box = C.$('#dl-table');
+    C.clear(box);
+    const n = +C.$('#dl-n').value;
+    const showGap = C.$('#dl-gap').checked;
+    const from = Math.max(0, D.length - n);
+    const rows = D.slice(from);
+    const series = C.gapSeries(D, C.keyOfType, from);
+
+    const tbody = C.el('tbody');
+    rows.forEach(function (r, i) {
+      const cells = [];
+      TYPE_ORDER.forEach(function (t) {
+        if (r.type === t) {
+          cells.push(C.el('td', {}, [
+            C.el('span', {
+              class: 'type-block',
+              style: 'background:' + TYPE_COLOR[t],
+              text: t
+            })
+          ]));
+        } else {
+          cells.push(C.el('td', {
+            class: 'num',
+            text: showGap ? String(C.gapOf(series[i], t)) : ''
+          }));
+        }
+      });
+      tbody.appendChild(C.el('tr', {}, [
+        C.el('td', { class: 'num', text: r.issue }),
+        C.el('td', { class: 'num draw-num', text: r.number }),
+        cells[0], cells[1], cells[2]
+      ]));
+    });
+
+    const table = C.el('table', {}, [
+      C.el('thead', {}, [C.el('tr', {}, [
+        C.el('th', { text: '期次' }),
+        C.el('th', { text: '开奖号' }),
+        C.el('th', { text: '组三' }),
+        C.el('th', { text: '组六' }),
+        C.el('th', { text: '豹子' })
+      ])]),
+      tbody
+    ]);
+    box.appendChild(C.tableScroll(table));
+    box.appendChild(C.el('div', {
+      class: 'note',
+      text: '色块 = 当期开出的组态；同一行其余两栏是"距上次出现过了多少期"。' +
+            '豹子（三个数字相同）理论上约 1% 才会出现一次，' +
+            '所以那一栏常年是三位数，这是正常的，不代表"快出了"。'
+    }));
+
+    C.clear(C.$('#dl-legend'));
+    C.$('#dl-legend').appendChild(C.el('div', {
+      html: '数据源：中国福彩网官方接口，共 ' + D.length + ' 期（' +
+            D[0].issue + ' ~ ' + D[D.length - 1].issue + '）。'
+    }));
+  }
+
+  window.GRID = { render: renderGrid };
+  window.DRAWLOG = { render: renderDrawLog };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    ['#tg-pos', '#tg-n', '#tg-line'].forEach(function (sel) {
+      const el = document.querySelector(sel);
+      if (el) el.addEventListener('change', renderGrid);
+    });
+    ['#dl-n', '#dl-gap'].forEach(function (sel) {
+      const el = document.querySelector(sel);
+      if (el) el.addEventListener('change', renderDrawLog);
+    });
+  });
 })();
 
 

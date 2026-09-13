@@ -72,6 +72,33 @@
     </div>
   </section>
 
+  <!-- ========== 开奖记录 ========== -->
+  <section class="panel hidden" id="p-drawlog">
+    <div class="card">
+      <h2>开奖记录（带组态遗漏）</h2>
+      <p class="hint">
+        每期开出的是豹子 / 组三 / 组六 中的一种：<b>命中的那一栏用色块标出</b>，
+        另外两栏显示"距上次出现已经过多少期"（0 = 上一期刚出过）。
+        组态占比由规则决定（组六约 72%、组三约 27%、豹子约 1%），
+        不存在"该轮到谁了"这回事。
+        <br><b>口径</b>：本表 0 = 上一期刚出过；有些站点把这种情况记作 1，读表时注意差 1 期。
+      </p>
+      <div class="row">
+        <label>显示期数
+          <select id="dl-n">
+            <option value="30" selected>最近 30 期</option>
+            <option value="50">最近 50 期</option>
+            <option value="100">最近 100 期</option>
+            <option value="200">最近 200 期</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="dl-gap" checked> 显示遗漏数字</label>
+      </div>
+      <div id="dl-table" style="margin-top:14px"></div>
+      <div class="legend" id="dl-legend"></div>
+    </div>
+  </section>
+
   <!-- ========== 走势图 ========== -->
   <section class="panel hidden" id="p-trend">
     <div class="card">
@@ -97,6 +124,35 @@
       <div class="chart-scroll" id="tr-sum"></div>
       <div class="chart-scroll" id="tr-span" style="margin-top:12px"></div>
     </div>
+
+    <div class="card">
+      <h2>遗漏网格（走势表）</h2>
+      <p class="hint">
+        每行一期，10 列是 0~9。<b>格子里的数字 = 该数字在这个位置上已经连续多少期没出现</b>
+        （0 = 上一期刚出过）；<b>被圈起来的格子就是当期开出的数字</b>，连线是它逐期的轨迹。
+        「不分位」把三个位置合起来看：一期开出 3 个数字，三个位置都会标圈。
+      </p>
+      <div class="row">
+        <label>位置
+          <select id="tg-pos">
+            <option value="0" selected>百位（第一位）</option>
+            <option value="1">十位（第二位）</option>
+            <option value="2">个位（第三位）</option>
+            <option value="3">不分位（三位一起看）</option>
+          </select>
+        </label>
+        <label>显示期数
+          <select id="tg-n">
+            <option value="30" selected>最近 30 期</option>
+            <option value="50">最近 50 期</option>
+            <option value="100">最近 100 期</option>
+          </select>
+        </label>
+        <label class="chk"><input type="checkbox" id="tg-line" checked> 显示连线</label>
+      </div>
+      <div class="chart-scroll" id="tg-chart"></div>
+      <div class="legend" id="tg-legend"></div>
+    </div>
   </section>
 
   <!-- ========== 遗漏 ========== -->
@@ -119,6 +175,16 @@
         <button class="btn ghost" id="om-sort">按当前遗漏排序</button>
       </div>
       <div id="om-tables" style="margin-top:14px"></div>
+    </div>
+
+    <div class="card">
+      <h2>历史统计（近 30 期 / 全历史对照）</h2>
+      <p class="hint">
+        每位每数字的长时间统计：出现次数、平均遗漏、最大遗漏、最大连出。
+        「近 30 期」这一栏用小窗口，是为了让你看清"最近偏热/偏冷"这类说法在短窗口里
+        其实年年都会出现——它和全历史放在一起对比，差别一眼可见。
+      </p>
+      <div id="hs-tables" style="margin-top:14px"></div>
     </div>
   </section>
 
