@@ -582,6 +582,9 @@ footer.end {
 /* 历史统计表：10 列要塞进双栏卡片里，字号和内边距都要收一点 */
 .hist-block table { font-size: 12px; }
 .hist-block th, .hist-block td { padding: 3px 5px; }
+/* 「球号」「当前遗漏」是跨两行的表头，默认垂直居中会卡在两行之间、
+   看起来比别的列名高一行；改成底部对齐，就和「出现/平均遗漏/…」同一行了 */
+.hist-block thead th[rowspan] { vertical-align: bottom; }
 
 /* ---------- 开奖记录 / 历史统计 ---------- */
 /* 组态色块：命中的那一栏（参考站的做法，一眼看出当期是组三/组六/豹子） */
