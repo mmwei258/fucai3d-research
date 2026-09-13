@@ -194,6 +194,23 @@
       </div>
 
       <div id="pk-result" style="margin-top:16px"></div>
+
+      <div class="save-box">
+        <h3>保存当期清单</h3>
+        <p class="hint">
+          把上面算出来的号码存成一份文档：含<b>选号条件、注数、金额、期望值</b>和
+          <b>全部覆盖号码</b>。换一套条件再算，就是另一份清单——所以几种选号方式可以分别存。
+        </p>
+        <div class="row">
+          <label>清单期号
+            <input type="text" id="pk-issue" inputmode="numeric" maxlength="7" style="width:96px">
+          </label>
+          <button class="btn" id="pk-export-copy">复制清单</button>
+          <button class="btn ghost" id="pk-export-file">下载清单（.txt）</button>
+          <button class="btn ghost" id="pk-export-print">打印 / 存为 PDF</button>
+        </div>
+        <div class="hint" id="pk-export-msg" style="margin-top:8px"></div>
+      </div>
     </div>
   </section>
 
@@ -262,6 +279,9 @@
     仅用于数据工程与统计方法研究 · 不构成任何投注建议
   </footer>
 </div>
+
+<!-- 打印 / 存 PDF 专用：只输出当期清单，页面其余部分在 @media print 里隐藏 -->
+<div id="print-area"></div>
 
 <script>
 /*__DATA__*/

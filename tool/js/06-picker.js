@@ -474,6 +474,8 @@
   }
 
   // ---------- 计算与结果 ----------
+  let LAST = null;            // 最近一次算出的结果，导出清单时直接用它，保证与屏幕一致
+
   function calc() {
     computeLimits();          // 先把输入框里的值过一遍范围校验，越界的一律不参与筛选
     const pool = baseDirect();
@@ -494,11 +496,19 @@
     const ev3 = n3 * (3 / 1000) * PRIZE_G3;
     const evTotal = evDirect + ev6 + ev3;
 
+    LAST = {
+      direct: direct, g6: g6, g3: g3,
+      nDirect: nDirect, n6: n6, n3: n3,
+      totalBets: totalBets, cost: cost, evTotal: evTotal,
+      exclN: exclN, exclCount: pool.length - poolNoRecent.length, recentSize: recent.size
+    };
+
     const box = C.$('#pk-result');
     C.clear(box);
 
     // ---- 什么都没选：给出可执行引导 ----
     if (totalBets === 0 && !hasAnyFilter()) {
+      LAST = null;
       const missing = [];
       for (let p = 0; p < 3; p++) if (posSel[p].size === 0) missing.push(POS_NAME[p]);
       const lines = [];
@@ -679,6 +689,171 @@
     ]));
   }
 
+  // ---------- 当期清单：复制 / 下载 / 打印 ----------
+  function digitsOf(set) {
+    const a = Array.from(set).sort(function (x, y) { return x - y; });
+    return a.length ? a.join(' ') : '无';
+  }
+
+  function rangeText(group) {
+    const ks = groupKeys(group);
+    if (fieldOut(ks[0]) || fieldOut(ks[1])) return '不限（填的数值超出范围，已忽略）';
+    const a = fieldVal(ks[0]), b = fieldVal(ks[1]);
+    if (a === null && b === null) return '不限';
+    if (a !== null && b !== null) return a === b ? String(a) : a + '~' + b;
+    return a !== null ? '≥ ' + a : '≤ ' + b;
+  }
+
+  function ratioText(set) {
+    const a = Array.from(set);
+    return a.length ? a.join(' ') : '不限';
+  }
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  // 清单期号：默认"数据末期号 + 1"，用户可以自己改（跨年等情况下以填写的为准）
+  function issueNo() {
+    const el = C.$('#pk-issue');
+    const raw = el && el.value !== undefined && el.value !== null ? String(el.value) : '';
+    const v = raw.replace(/[^\d]/g, '');
+    return v || String(+D[D.length - 1].issue + 1);
+  }
+
+  function nowText() {
+    const d = new Date();
+    return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()) +
+           ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+  }
+
+  function numLines(list, per) {
+    const out = [];
+    for (let i = 0; i < list.length; i += per) {
+      out.push('  ' + list.slice(i, i + per).join(' '));
+    }
+    return out;
+  }
+
+  function buildList() {
+    const L = LAST, last = D[D.length - 1];
+    const gapT = rangeText('gap');
+    const out = [];
+    const push = function (s) { out.push(s); };
+    push('福彩3D 当期号码清单');
+    push('========================================');
+    push('清单期号：' + issueNo());
+    push('生成时间：' + nowText());
+    push('数据截至：第 ' + last.issue + ' 期（' + last.date + '，开出 ' + last.number + '）');
+    push('');
+    push('本清单只是把你选定的条件换算成具体号码与金额，');
+    push('不代表这些号码更容易中奖，也不构成投注建议。');
+    push('');
+    push('【选号条件】');
+    push('  按位选号：第一位 ' + digitsOf(posSel[0]) + '；第二位 ' + digitsOf(posSel[1]) +
+         '；第三位 ' + digitsOf(posSel[2]));
+    push('  组选选号：' + digitsOf(grpSel));
+    push('  胆码：' + (danSel.size
+      ? digitsOf(danSel) + '（规则：' + (danMode === 'all' ? '必须全含' : '至少含一个') + '）'
+      : '无'));
+    push('  和值：' + rangeText('sum'));
+    push('  跨度：' + rangeText('span'));
+    push('  号码遗漏：' + gapT + (gapT.indexOf('不限') === 0 ? '' : ' 期'));
+    push('  大小比：' + ratioText(f.bs));
+    push('  奇偶比：' + ratioText(f.oe));
+    push('  排除已开出：' + (L.exclN
+      ? '最近 ' + L.exclN + ' 期（剔除 ' + L.exclCount + ' 个号码）'
+      : '不排除'));
+    push('');
+    push('【合计】');
+    push('  总注数：' + C.comma(L.totalBets) + ' 注');
+    push('  投注金额：' + C.comma(L.cost) + ' 元');
+    push('  直选覆盖概率：' + C.pct(L.nDirect / 1000, 3));
+    push('  期望回收：' + C.comma(Math.round(L.evTotal)) + ' 元' +
+         '（回报率 ' + C.pct(L.cost ? L.evTotal / L.cost : 0, 1) +
+         '，长期期望净亏 ' + C.comma(Math.round(L.evTotal - L.cost)) + ' 元）');
+    push('  明细：直选 ' + L.nDirect + ' 注 / 组选六 ' + L.n6 + ' 注 / 组选三 ' + L.n3 + ' 注');
+    push('');
+    push('【直选号码】（' + L.nDirect + ' 个，位置固定，顺序不对不算中）');
+    numLines(L.direct, 10).forEach(push);
+    if (!L.nDirect) push('  （无）');
+    push('');
+    push('【组选六号码】（' + L.n6 + ' 个，3 个不同数字，不看顺序）');
+    numLines(L.g6, 10).forEach(push);
+    if (!L.n6) push('  （无）');
+    push('');
+    push('【组选三号码】（' + L.n3 + ' 个，2 个相同数字，不看顺序）');
+    numLines(L.g3, 10).forEach(push);
+    if (!L.n3) push('  （无）');
+    push('');
+    push('【说明】');
+    push('  彩票每期独立随机，历史数据对未来结果没有预测力；官方返奖率约 52%，');
+    push('  长期参与的数学期望为负。筛选不会提高回报率，只是少买少亏。');
+    push('  数据来源：中国福彩网官方接口 · AAAAAAA 22 / 22年双彩店');
+    return out.join('\n');
+  }
+
+  function exportMsg(text, warn) {
+    const box = C.$('#pk-export-msg');
+    if (!box) return;
+    box.textContent = text;
+    box.style.color = warn ? '#a8232a' : '';
+  }
+
+  function listOrMsg() {
+    if (!LAST || !LAST.totalBets) {
+      exportMsg('当前没有可保存的号码：先选号或设置筛选条件（0 注时清单是空的）。', true);
+      return null;
+    }
+    return buildList();
+  }
+
+  function copyToClipboard(text) {
+    if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      document.body.removeChild(ta);
+      if (ok) resolve(); else reject(new Error('浏览器不允许自动复制'));
+    });
+  }
+
+  function fileName() {
+    return '福彩3D-' + issueNo() + '-号码清单.txt';
+  }
+
+  function downloadList(text) {
+    // 带 BOM：Windows 记事本打开才不会乱码
+    const blob = new Blob(['\ufeff' + text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
+  function printList(text) {
+    const box = C.$('#print-area');
+    C.clear(box);
+    box.appendChild(C.el('div', { class: 'list-text', text: text }));
+    box.appendChild(C.el('div', {
+      class: 'list-text',
+      style: 'margin-top:10px;font-size:11px;color:#666',
+      text: '本清单为历史数据的统计结果，不构成投注建议。'
+    }));
+    if (typeof window.print === 'function') window.print();
+  }
+
   function render() {
     if (!wired) {
       wired = true;
@@ -693,6 +868,43 @@
       });
       C.$('#pk-exclude-window').addEventListener('change', calc);
       C.$('#pk-calc').addEventListener('click', calc);
+
+      // 清单期号默认 = 数据末期号 + 1（可改）
+      const iss = C.$('#pk-issue');
+      if (iss) {
+        iss.value = String(+D[D.length - 1].issue + 1);
+        iss.addEventListener('input', function (e) {
+          const v = String(e.target.value).replace(/[^\d]/g, '');
+          if (v !== e.target.value) e.target.value = v;
+        });
+      }
+      C.$('#pk-export-copy').addEventListener('click', function () {
+        const t = listOrMsg();
+        if (t === null) return;
+        copyToClipboard(t).then(function () {
+          exportMsg('清单已复制到剪贴板（' + C.comma(LAST.totalBets) + ' 注 / ' +
+                    C.comma(LAST.cost) + ' 元），可直接粘贴到微信或备忘录。');
+        })['catch'](function () {
+          exportMsg('浏览器不允许自动复制（比如离线打开时）。请改用「下载清单」或手动全选复制。', true);
+        });
+      });
+      C.$('#pk-export-file').addEventListener('click', function () {
+        const t = listOrMsg();
+        if (t === null) return;
+        try {
+          downloadList(t);
+          exportMsg('已下载 ' + fileName() + '（' + C.comma(LAST.totalBets) + ' 注）。' +
+                    '手机上文件通常在「下载」里。');
+        } catch (e) {
+          exportMsg('下载失败：' + e.message + '。可以改用「复制清单」。', true);
+        }
+      });
+      C.$('#pk-export-print').addEventListener('click', function () {
+        const t = listOrMsg();
+        if (t === null) return;
+        printList(t);
+        exportMsg('已调起打印。手机上选「保存为 PDF」即可存成文档。');
+      });
     }
     refresh();
   }
@@ -700,6 +912,7 @@
   window.PICKER = {
     render: render,
     _state: { posSel: posSel, grpSel: grpSel, danSel: danSel, filters: f },
+    _buildList: function () { return LAST ? buildList() : null; },
     _passes: passes
   };
 })();

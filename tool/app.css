@@ -578,3 +578,33 @@ footer.end {
 }
 
 .hidden { display: none !important; }
+
+/* ---------- 保存当期清单 ---------- */
+.save-box {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--line);
+}
+
+.save-box .row { margin-top: 10px; }
+.save-box input[type="text"] { padding: 6px 8px; font-size: 13px; }
+
+/* 清单正文：等宽、可整块复制；打印时也用它 */
+.list-text {
+  font-family: ui-monospace, Consolas, "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* 打印 / 存 PDF：只保留当期清单 */
+#print-area { display: none; }
+
+@media print {
+  body { background: #fff; }
+  .top, .wrap { display: none !important; }
+  #print-area { display: block; }
+  #print-area .list-text { font-size: 11pt; }
+  @page { margin: 14mm; }
+}
