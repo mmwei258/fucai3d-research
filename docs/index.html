@@ -545,18 +545,32 @@ footer.end {
   th, td { padding: 5px 7px; }
   .bar-cell { width: 34%; }
 
-    /* 数字按钮：一行 5 个，触控目标加大
-       必须限定 .digit-btn —— 否则同容器内的 .clear-btn 也会被拉伸成整行宽 */
-    #pk-pos button.digit-btn, #pk-group button.digit-btn { flex: 1 1 17%; min-width: 44px; }
+    /* 数字按钮：一行恰好 4 个，每个 1/4 宽。
+       min-width:0 必须显式写——否则浏览器的"内容最小宽度"会让每行的个数
+       随字号/机型变化（同一份代码在不同手机上 4 个或 5 个/行）。
+       必须限定 .digit-btn —— 否则同容器内的 .clear-btn 也会被一起拉伸 */
+    #pk-pos button.digit-btn, #pk-group button.digit-btn {
+      flex: 1 1 calc(25% - 5px);
+      min-width: 0;
+    }
     .digit-btn { padding: 10px 0; font-size: 16px; }
 
-    /* 窄屏下数字键占满两行，清空按钮另起一行并占满整行——
-       比缩成一个小按钮吊在第三行更好看，也更好点 */
-    .clear-btn {
-      flex: 1 1 100%;
+    /* 0~9 排到最后一行只剩 8、9 两个数字，空出来的半行正好放「清空」，
+       不再另起一行；宽度是数字键的两倍（= 一行的 50%） */
+    #pk-pos .clear-btn, #pk-group .clear-btn {
+      flex: 2 1 calc(50% - 7px);
       margin-left: 0;
-      margin-top: 4px;
+      margin-top: 0;
       min-width: 0;
+      padding: 10px 12px;
+      font-size: 15px;
+    }
+
+    /* 胆码那一排是 chip（比数字键小），清空跟在最后一个 chip 后面、吃掉本行剩余宽度 */
+    #pk-filters .clear-btn {
+      flex: 1 1 96px;
+      margin-left: 0;
+      margin-top: 0;
       padding: 10px 12px;
       font-size: 15px;
     }
