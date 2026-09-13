@@ -60,7 +60,9 @@
         if (k === 'class') node.className = attrs[k];
         else if (k === 'html') node.innerHTML = attrs[k];
         else if (k === 'text') node.textContent = attrs[k];
+        else if (k === 'disabled') node.disabled = !!attrs[k];
         else if (k.indexOf('on') === 0) node.addEventListener(k.slice(2), attrs[k]);
+        else if (attrs[k] === null || attrs[k] === undefined) { /* 跳过空属性 */ }
         else node.setAttribute(k, attrs[k]);
       });
     }

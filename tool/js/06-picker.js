@@ -146,6 +146,19 @@
     });
   }
 
+  /* 一组的"一键清空"：比数字键大约一倍，暖橙色，空组时置灰 */
+  function clearButton(set, count) {
+    return C.el('button', {
+      class: 'clear-btn',
+      text: '✕ 清空',
+      disabled: count === 0,
+      onclick: function () {
+        set.clear();
+        refresh();
+      }
+    });
+  }
+
   function ratioRow(values, set) {
     const row = C.el('div', { class: 'chip-row' });
     values.forEach(function (v) {
@@ -200,14 +213,15 @@
 
     box.appendChild(grid);
 
-    box.appendChild(C.el('div', { class: 'filter-item', style: 'margin-top:12px' }, [
-      C.el('span', { class: 'fl', text: '胆码' }),
-      digitPad(danSel, refresh, 'chip-btn'),
+    // 胆码也是"选数字"的分组，同样给一个一键清空
+    box.appendChild(C.el('div', { class: 'pad-head', style: 'margin-top:14px' }, [
       C.el('span', {
-        style: 'color:var(--ink-3);font-size:12px',
-        text: '（号码必须包含选中的每一个数字）'
-      })
+        class: 'pad-title',
+        text: '胆码  （号码必须包含选中的每一个数字）'
+      }),
+      clearButton(danSel, danSel.size)
     ]));
+    box.appendChild(digitPad(danSel, refresh, 'chip-btn'));
 
     if (hasAnyFilter()) {
       box.appendChild(C.el('div', { style: 'margin-top:10px' }, [
@@ -227,21 +241,27 @@
     const posBox = C.$('#pk-pos');
     C.clear(posBox);
     for (let p = 0; p < 3; p++) {
-      posBox.appendChild(C.el('div', { style: 'margin:8px 0' }, [
-        C.el('div', {
-          style: 'font-size:12.5px;color:var(--ink-2);margin-bottom:5px',
-          text: POS_NAME[p] + '（已选 ' + posSel[p].size + ' 个）'
-        }),
+      posBox.appendChild(C.el('div', { style: 'margin:10px 0' }, [
+        C.el('div', { class: 'pad-head' }, [
+          C.el('span', {
+            class: 'pad-title',
+            text: POS_NAME[p] + '（已选 ' + posSel[p].size + ' 个）'
+          }),
+          clearButton(posSel[p], posSel[p].size)
+        ]),
         digitPad(posSel[p], refresh)
       ]));
     }
 
     const grpBox = C.$('#pk-group');
     C.clear(grpBox);
-    grpBox.appendChild(C.el('div', {
-      style: 'font-size:12.5px;color:var(--ink-3);margin-bottom:5px',
-      text: '选中若干数字（已选 ' + grpSel.size + ' 个），自动展开为组选六 / 组选三组合'
-    }));
+    grpBox.appendChild(C.el('div', { class: 'pad-head' }, [
+      C.el('span', {
+        class: 'pad-title',
+        text: '选中若干数字（已选 ' + grpSel.size + ' 个），自动展开为组选六 / 组选三组合'
+      }),
+      clearButton(grpSel, grpSel.size)
+    ]));
     grpBox.appendChild(digitPad(grpSel, refresh));
   }
 
