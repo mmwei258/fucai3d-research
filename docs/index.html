@@ -787,11 +787,9 @@ footer.end {
             <option value="3">不分位（三位一起看）</option>
           </select>
         </label>
-        <label>显示期数
-          <select id="tg-n">
-            <option value="30" selected>最近 30 期</option>
-            <option value="50">最近 50 期</option>
-            <option value="100">最近 100 期</option>
+        <label>起始期
+          <select id="tg-start">
+            <option value="">最近 30 期</option>
           </select>
         </label>
         <label class="chk"><input type="checkbox" id="tg-line" checked> 显示连线</label>
@@ -3482,15 +3480,19 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
   }
 
   /* ---------------- 走势网格 ---------------- */
-  const GW_WIDE = 26, RH_WIDE = 22;
-  // 手机上把行高加大、字形放大（看得清），列宽只加到刚好放得下——
-  // 390px 屏的可用宽度约 340px，56 + 10×28 = 336 正好不触发横向滚动
-  const GW_NARROW = 28, RH_NARROW = 25;
-  const HEAD = 20, ISSUE_W = 56;
+  const GW = 26, RH_WIDE = 22;
+  // 手机上只把行高加大（看得清），列宽保持一致——
+  // 期次+开奖号占 74，74 + 10×26 = 334，390px 屏的可用宽度约 340px，正好不横滑
+  const RH_NARROW = 25;
+  const HEAD = 20, ISSUE_W = 74;
+  /* 超长窗口（>1200 期）不画格子里的遗漏数字：4750 期会把节点数推到 6 万，
+     手机上要卡好几秒，而且那个尺度下格子里的小字本来也看不清。
+     压缩模式只保留命中圈和连线——看历史走势够用了。 */
+  const COMPACT_LIMIT = 1200;
 
   function gridChart(rows, from, posIdx, showLine, isNarrow) {
-    const GW = isNarrow ? GW_NARROW : GW_WIDE;
     const RH = isNarrow ? RH_NARROW : RH_WIDE;
+    const compact = rows.length > COMPACT_LIMIT;
     const isAny = posIdx === 3;
     const keysOf = isAny ? C.digitKeys : C.keyOfPos(posIdx);
     const series = C.gapSeries(D, keysOf, from);
@@ -3502,8 +3504,9 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     const cx = function (d) { return ISSUE_W + d * GW + GW / 2; };
     const cy = function (i) { return HEAD + i * RH + RH / 2; };
 
-    // 表头
-    svg.appendChild(svgText(ISSUE_W / 2, HEAD - 6, '期次', { size: 10 }));
+    // 表头：期次 + 开奖号两小列
+    svg.appendChild(svgText(24, HEAD - 6, '期次', { size: 10 }));
+    svg.appendChild(svgText(60, HEAD - 6, '号码', { size: 10 }));
     for (let d = 0; d <= 9; d++) {
       svg.appendChild(svgText(cx(d), HEAD - 6, String(d), { size: 11, fill: '#5a6879' }));
     }
@@ -3523,12 +3526,16 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
 
     const hits = [];                       // 每期命中的数字（不分位时有多个）
     rows.forEach(function (r, i) {
-      svg.appendChild(svgText(ISSUE_W / 2, cy(i) + 3.5, r.issue, { size: 9.5, fill: '#6b7686' }));
+      // 期号靠右、开奖号跟在它旁边（红色，和开奖记录页一个颜色）
+      svg.appendChild(svgText(ISSUE_W - 26, cy(i) + 3.5, r.issue,
+        { size: 9.5, fill: '#6b7686', anchor: 'end' }));
+      svg.appendChild(svgText(ISSUE_W - 22, cy(i) + 3.5, r.number,
+        { size: 9.5, fill: '#c0392b', anchor: 'start' }));
       const hit = keysOf(r);
       hits.push(hit);
       for (let d = 0; d <= 9; d++) {
         const on = hit.indexOf(d) >= 0;
-        if (!on) {
+        if (!on && !compact) {
           svg.appendChild(svgText(cx(d), cy(i) + 3.5, String(C.gapOf(series[i], d)), { size: 10 }));
         }
       }
@@ -3572,20 +3579,65 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
     return svg;
   }
 
+  /* 起始期选项：让用户挑"从哪一期开始"，终点永远是数据最新一期。
+     既保留常用档位（最近 30/50/100/200/500/1000 期），
+     也按每 500 期列出具体期号，最后一项是从最早一期开始（全部历史）。 */
+  const START_COUNTS = [30, 50, 100, 200, 500, 1000];
+  function startOptions() {
+    const total = D.length;
+    const out = [];
+    const seen = {};
+    const add = function (start, label) {
+      if (start < 0 || start >= total || seen[start]) return;
+      seen[start] = 1;
+      out.push({ start: start, label: label });
+    };
+    START_COUNTS.forEach(function (n) {
+      if (n > total) return;
+      const s = total - n;
+      add(s, '最近 ' + n + ' 期（从 ' + D[s].issue + ' 起）');
+    });
+    for (let k = 9; k >= 0; k--) {
+      const s = total - 1 - k * 500;
+      if (k === 0 || s <= 0) break;          // k=0 会得到"只有 1 期"，没意义
+      add(s, '从 ' + D[s].issue + ' 期起（' + (total - s) + ' 期）');
+    }
+    add(0, '从最早一期 ' + D[0].issue + ' 起（全部 ' + total + ' 期）');
+    return out;
+  }
+
+  let startBuilt = false;
+  function buildStartSelect() {
+    const sel = C.$('#tg-start');
+    if (!sel || startBuilt) return;
+    startBuilt = true;
+    C.clear(sel);                       // 清掉骨架里的占位选项
+    const opts = startOptions();
+    opts.forEach(function (o) {
+      sel.appendChild(C.el('option', { value: String(o.start), text: o.label }));
+    });
+    sel.value = String(opts[0].start);  // 默认"最近 30 期"
+    sel.addEventListener('change', renderGrid);
+  }
+
   function renderGrid() {
+    buildStartSelect();
     const box = C.$('#tg-chart');
     C.clear(box);
     const posIdx = +C.$('#tg-pos').value;
-    const n = +C.$('#tg-n').value;
+    const sel = C.$('#tg-start');
+    let from = sel && sel.value !== '' ? +sel.value : D.length - 30;
+    if (!(from >= 0) || from >= D.length) from = Math.max(0, D.length - 30);
     const showLine = C.$('#tg-line').checked;
     const isNarrow = C.narrow();
-    const from = Math.max(0, D.length - n);
     const rows = D.slice(from);
 
     const head = C.el('div', {
       style: 'font-size:12.5px;color:' + GRID_COLOR[posIdx] +
              ';margin:2px 0 6px 6px;font-weight:600',
-      text: POS_NAME[posIdx] + '　最近 ' + rows.length + ' 期' + (isNarrow ? '（手机版格子加大）' : '')
+      text: POS_NAME[posIdx] + '　' + D[from].issue + ' ~ ' + D[D.length - 1].issue +
+            '（' + rows.length + ' 期）' + (isNarrow ? '　手机版行距更大' : '') +
+            (rows.length > COMPACT_LIMIT ? '　超长窗口：只画命中圈和连线' : '')
     });
     box.appendChild(head);
     box.appendChild(gridChart(rows, from, posIdx, showLine, isNarrow));
@@ -3597,7 +3649,9 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
             (posIdx === 3
               ? '「不分位」的连线表示<b>同一个数字</b>的相邻两次出现。'
               : '连线表示每期开出数字的先后顺序。') +
-            '遗漏值大 ≠ 该出了：每期都是独立事件。'
+            '遗漏值大 ≠ 该出了：每期都是独立事件。<br>' +
+            '起始期可以一路选到最早一期（2013002）；超过 ' + COMPACT_LIMIT +
+            ' 期时不画格子里的小字，只保留命中圈和连线。'
     }));
   }
 
@@ -3701,7 +3755,7 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
   window.DRAWLOG = { render: renderDrawLog };
 
   document.addEventListener('DOMContentLoaded', function () {
-    ['#tg-pos', '#tg-n', '#tg-line'].forEach(function (sel) {
+    ['#tg-pos', '#tg-line'].forEach(function (sel) {
       const el = document.querySelector(sel);
       if (el) el.addEventListener('change', renderGrid);
     });
