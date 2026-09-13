@@ -11,6 +11,13 @@
   const posSel = [new Set(), new Set(), new Set()];
   const grpSel = new Set();
   const danSel = new Set();
+  /* 胆码规则：
+     'all' —— 号码必须同时包含选中的每一个数字（传统"胆码"的口径）
+     'any' —— 号码至少包含选中数字中的任意一个
+     三位号码最多只能容纳 3 个不同数字，所以选到第 4 个时 'all' 必然 0 注。
+     届时代码会自动切到 'any' 并说明原因，绝不静默给出 0 注。 */
+  let danMode = 'all';
+  let danAutoSwitched = false;
   const f = {
     sumMin: '', sumMax: '', spanMin: '', spanMax: '', gapMin: '', gapMax: '',
     bs: new Set(), oe: new Set()
@@ -52,6 +59,11 @@
         || f.bs.size > 0 || f.oe.size > 0 || danSel.size > 0;
   }
 
+  // 选中的胆码个数已经超过三位号码能容纳的不同数字上限
+  function danOverflow() { return danMode === 'all' && danSel.size > 3; }
+
+  function includeDigit(num, d) { return num.indexOf(String(d)) >= 0; }
+
   function passes(num) {
     if (f.sumMin !== '' && sumOf(num) < +f.sumMin) return false;
     if (f.sumMax !== '' && sumOf(num) > +f.sumMax) return false;
@@ -61,9 +73,11 @@
     if (f.oe.size && !f.oe.has(oddEvenRatio(num))) return false;
     if (danSel.size) {
       const ds = Array.from(danSel);
+      let hit = 0;
       for (let i = 0; i < ds.length; i++) {
-        if (num.indexOf(String(ds[i])) < 0) return false;
+        if (includeDigit(num, ds[i])) hit++;
       }
+      if (danMode === 'all' ? hit < ds.length : hit === 0) return false;
     }
     if (f.gapMin !== '' && GAP[+num] < +f.gapMin) return false;
     if (f.gapMax !== '' && GAP[+num] > +f.gapMax) return false;
@@ -141,13 +155,47 @@
 
   function numInput(key, ph, min, max) {
     return C.el('input', {
-      type: 'number', value: f[key], placeholder: ph || '',
+      type: 'number', id: 'pk-f-' + key, value: f[key], placeholder: ph || '',
       min: String(min), max: String(max),
       oninput: function (e) {
         f[key] = e.target.value;
-        refresh();
+        /* 只更新结果，绝不重建筛选区：
+           曾经这里调 refresh() → buildFilters() 把输入框整个换掉，
+           用户敲下第一个字符就失焦（type=number 也无法还原光标位置）。 */
+        updateResetBtn();
+        calc();
       }
     });
+  }
+
+  /* 胆码开关：选到第 4 个时"必须全含"数学上不可能，自动切到"至少含一个"并说明 */
+  function danToggle() {
+    if (danMode === 'all' && danSel.size > 3) {
+      danMode = 'any';
+      danAutoSwitched = true;
+    }
+    refresh();
+  }
+
+  function setDanMode(mode) {
+    danMode = mode;
+    danAutoSwitched = false;
+    refresh();
+  }
+
+  function danModeSwitch() {
+    const seg = C.el('div', { class: 'seg' });
+    [['all', '必须全含'], ['any', '至少含一个']].forEach(function (m) {
+      seg.appendChild(C.el('button', {
+        class: 'chip-btn' + (danMode === m[0] ? ' on' : ''),
+        text: m[1],
+        title: m[0] === 'all'
+          ? '号码必须同时包含选中的每一个数字'
+          : '号码至少包含选中数字中的任意一个',
+        onclick: function () { setDanMode(m[0]); }
+      }));
+    });
+    return seg;
   }
 
   /* 一组的"一键清空"：比数字键大约一倍，暖橙色，空组时置灰 */
@@ -217,28 +265,60 @@
 
     box.appendChild(grid);
 
-    // 胆码也是"选数字"的分组，同样给一个一键清空
-    box.appendChild(C.el('div', { class: 'filter-item', style: 'margin-top:14px' }, [
+    // 胆码也是"选数字"的分组，同样给一个一键清空；
+    // 规则必须摆在明面上——否则"选了 4 个胆码却出 0 注"看起来像坏了
+    grid.appendChild(C.el('div', { class: 'filter-item' }, [
       C.el('span', { class: 'fl', text: '胆码' }),
-      C.el('span', {
-        style: 'color:var(--ink-3);font-size:12px',
-        text: '（号码必须包含选中的每一个数字）'
-      })
+      danModeSwitch()
     ]));
-    box.appendChild(digitPad(danSel, refresh, 'chip-btn', danSel));
 
-    if (hasAnyFilter()) {
-      box.appendChild(C.el('div', { style: 'margin-top:10px' }, [
-        C.el('button', {
-          class: 'btn ghost', text: '重置筛选',
-          onclick: function () {
-            f.sumMin = f.sumMax = f.spanMin = f.spanMax = f.gapMin = f.gapMax = '';
-            f.bs.clear(); f.oe.clear(); danSel.clear();
-            refresh();
-          }
+    box.appendChild(C.el('div', {
+      class: 'hint',
+      style: 'margin:14px 0 6px',
+      text: '胆码规则：' + (danMode === 'all'
+        ? '号码必须同时包含选中的每一个数字。'
+        : '号码至少包含选中数字中的任意一个。')
+    }));
+    box.appendChild(digitPad(danSel, danToggle, 'chip-btn', danSel));
+
+    if (danOverflow()) {
+      box.appendChild(C.el('div', { class: 'note warn', style: 'margin-top:10px' }, [
+        C.el('div', {
+          html: '<b>已选 ' + danSel.size + ' 个胆码，「必须全含」不可能成立：</b>' +
+                '三位号码最多只能包含 3 个不同数字，所以当前必然是 0 注。' +
+                '把规则切成「至少含一个」就能出号。'
+        })
+      ]));
+    } else if (danAutoSwitched && danSel.size > 3) {
+      box.appendChild(C.el('div', { class: 'note', style: 'margin-top:10px' }, [
+        C.el('div', {
+          html: '选到第 4 个胆码时已自动切换为「至少含一个」——三位号码最多容纳 ' +
+                '3 个不同数字，「必须全含」必然是 0 注。可随时切回。'
         })
       ]));
     }
+
+    // 重置按钮常驻 DOM、只切换显隐：否则"第一次输入筛选值"也要重建筛选区
+    box.appendChild(C.el('div', {
+      id: 'pk-reset-wrap',
+      class: hasAnyFilter() ? '' : 'hidden',
+      style: 'margin-top:10px'
+    }, [
+      C.el('button', {
+        class: 'btn ghost', text: '重置筛选',
+        onclick: function () {
+          f.sumMin = f.sumMax = f.spanMin = f.spanMax = f.gapMin = f.gapMax = '';
+          f.bs.clear(); f.oe.clear(); danSel.clear();
+          danMode = 'all'; danAutoSwitched = false;
+          refresh();
+        }
+      })
+    ]));
+  }
+
+  function updateResetBtn() {
+    const w = C.$('#pk-reset-wrap');
+    if (w) w.className = hasAnyFilter() ? '' : 'hidden';
   }
 
   function buildPads() {
@@ -355,6 +435,11 @@
       notes.push('筛选条件从 ' + poolNoRecent.length + ' 个直选号码中保留了 ' +
                  nDirect + ' 个，剔除 ' + (poolNoRecent.length - nDirect) + ' 个。');
     }
+    if (danOverflow()) {
+      notes.push('胆码选了 ' + danSel.size + ' 个、规则为「必须全含」：三位号码最多含 3 个' +
+                 '不同数字，因此 0 注是规则本身的必然结果，不是程序出错。' +
+                 '把胆码规则切成「至少含一个」即可出号。');
+    }
     if (posDigitsSelected() === 0 && pool.length === 1000) {
       notes.push('未指定具体数字，基数是全部 1000 种组合，因此注数较大——' +
                  '请用筛选条件继续收窄。');
@@ -416,6 +501,18 @@
     // 只有真的剔除了号码才说"缩小范围"，否则会出现"从 18 注缩到 18 注"这种废话
     const narrowed = poolNoRecent.length > nDirect;
     const removedByFilter = poolNoRecent.length - nDirect;
+    if (cost === 0) {
+      // 0 注时上面显示的是 0 元 / 0.0%，此时再说"期望回报率恒为 52%"就自相矛盾了
+      box.appendChild(C.el('div', { class: 'note warn' }, [
+        C.el('div', {
+          html: '<b>当前是 0 注：没有任何号码落在你设定的条件里，所以不产生投注，' +
+                '也没有可谈的中奖概率。</b>这不是"省钱"，只是这组条件圈不出号码。' +
+                '条件放宽后，注数、花费、中奖概率会一起变大——' +
+                '而回报率仍由彩票规则决定（直选 52%），与选多选少无关。'
+        })
+      ]));
+      return;
+    }
     box.appendChild(C.el('div', { class: 'note warn' }, [
       C.el('div', {
         html: '<b>筛选不会提高回报率，也不会让你"省钱"。</b>' +
@@ -443,6 +540,7 @@
         posSel.forEach(function (s) { s.clear(); });
         grpSel.clear();
         danSel.clear();
+        danMode = 'all'; danAutoSwitched = false;
         f.sumMin = f.sumMax = f.spanMin = f.spanMax = f.gapMin = f.gapMax = '';
         f.bs.clear(); f.oe.clear();
         refresh();

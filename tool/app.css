@@ -321,6 +321,13 @@ label.chk {
 
 .chip-row { display: flex; gap: 5px; flex-wrap: wrap; }
 
+/* 胆码规则二选一：两个按钮拼成一段，明确"当前用哪条规则" */
+.seg { display: inline-flex; }
+.seg .chip-btn + .chip-btn { margin-left: -1px; }
+.seg .chip-btn:first-child { border-radius: 6px 0 0 6px; }
+.seg .chip-btn:last-child { border-radius: 0 6px 6px 0; }
+.seg .chip-btn.on { position: relative; z-index: 1; }
+
 /* 覆盖号码展示：单个号码做成醒目的号码块 */
 .num-list { display: flex; flex-wrap: wrap; gap: 8px; }
 
