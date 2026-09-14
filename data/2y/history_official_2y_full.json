@@ -3,72 +3,6 @@
     "source": "cwl.gov.cn official API",
     "source_endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
     "name": "3D",
-    "issue": "2024246",
-    "date": "2024-09-12",
-    "date_raw": "2024-09-12(四)",
-    "week": "四",
-    "number": "710",
-    "red": "7,1,0",
-    "digits": [
-      7,
-      1,
-      0
-    ],
-    "blue": "",
-    "blue2": "",
-    "sales": 120822672,
-    "poolmoney": "",
-    "content": "",
-    "addmoney": "",
-    "addmoney2": "",
-    "msg": "",
-    "z2add": "",
-    "m2add": "",
-    "detailsLink": "https://www.cwl.gov.cn/c/2024/09/12/588832.shtml",
-    "videoLink": "",
-    "prizegrades": [
-      {
-        "type": 1,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 2,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 3,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 4,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 5,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 6,
-        "typemoney": "",
-        "typenum": ""
-      },
-      {
-        "type": 7,
-        "typemoney": "",
-        "typenum": ""
-      }
-    ],
-    "updated_at": "2026-09-14T13:53:04Z"
-  },
-  {
-    "source": "cwl.gov.cn official API",
-    "source_endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
-    "name": "3D",
     "issue": "2024247",
     "date": "2024-09-13",
     "date_raw": "2024-09-13(五)",
@@ -46396,5 +46330,137 @@
       }
     ],
     "updated_at": "2026-09-14T13:53:04Z"
+  },
+  {
+    "source": "cwl.gov.cn official API",
+    "source_endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
+    "name": "3D",
+    "issue": "2026246",
+    "date": "2026-09-13",
+    "date_raw": "2026-09-13(日)",
+    "week": "日",
+    "number": "982",
+    "red": "9,8,2",
+    "digits": [
+      9,
+      8,
+      2
+    ],
+    "blue": "",
+    "blue2": "",
+    "sales": 98247910,
+    "poolmoney": "",
+    "content": "",
+    "addmoney": "",
+    "addmoney2": "",
+    "msg": "",
+    "z2add": "",
+    "m2add": "",
+    "detailsLink": "https://www.cwl.gov.cn/c/2026/09/13/666664.shtml",
+    "videoLink": "",
+    "prizegrades": [
+      {
+        "type": 1,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 2,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 3,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 4,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 5,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 6,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 7,
+        "typemoney": "",
+        "typenum": ""
+      }
+    ],
+    "updated_at": "2026-09-14T14:15:42Z"
+  },
+  {
+    "source": "cwl.gov.cn official API",
+    "source_endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
+    "name": "3D",
+    "issue": "2026247",
+    "date": "2026-09-14",
+    "date_raw": "2026-09-14(一)",
+    "week": "一",
+    "number": "609",
+    "red": "6,0,9",
+    "digits": [
+      6,
+      0,
+      9
+    ],
+    "blue": "",
+    "blue2": "",
+    "sales": 102179952,
+    "poolmoney": "",
+    "content": "",
+    "addmoney": "",
+    "addmoney2": "",
+    "msg": "",
+    "z2add": "",
+    "m2add": "",
+    "detailsLink": "https://www.cwl.gov.cn/c/2026/09/14/666871.shtml",
+    "videoLink": "",
+    "prizegrades": [
+      {
+        "type": 1,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 2,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 3,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 4,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 5,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 6,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 7,
+        "typemoney": "",
+        "typenum": ""
+      }
+    ],
+    "updated_at": "2026-09-14T14:15:42Z"
   }
 ]
