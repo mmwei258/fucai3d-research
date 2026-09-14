@@ -638,6 +638,10 @@ footer.end {
 /* 手机版：组态色块后面跟的一行小字（另外两种组态各遗漏多少期） */
 .gap-mini { margin-left: 6px; font-size: 11.5px; color: var(--ink-3); }
 
+/* 手机版「组态」栏必须左对齐：表格默认右对齐，小字长度一变色块就跟着漂，
+   几行摆在一起色块就参差不齐。左对齐后所有色块在同一条竖线上。 */
+.type-cell { text-align: left; }
+
 /* 球号徽标（历史统计表第一列） */
 .ball-badge {
   display: inline-flex;
@@ -715,7 +719,7 @@ footer.end {
     <div class="card">
       <h2>数据概览</h2>
       <p class="hint" id="ov-range"></p>
-      <p class="hint" id="ov-built">本页构建于 2026-09-14 22:17（北京时间）</p>
+      <p class="hint" id="ov-built">本页构建于 2026-09-14 22:36（北京时间）</p>
       <div class="note warn hidden" id="ov-stale"></div>
       <div class="stats" id="ov-stats"></div>
       <div class="note" id="ov-note"></div>
@@ -4142,7 +4146,9 @@ const FUCAI3D_DATA = [["2013002","2013-01-02","670",5148.9],["2013006","2013-01-
       tbody.appendChild(C.el('tr', {}, [
         C.el('td', { class: 'num', text: r.issue }),
         C.el('td', { class: 'num draw-num', text: r.number }),
-        C.el('td', {}, [
+        // 加 type-cell：这一栏是"色块 + 深浅不一的小字"，若按表格默认的右对齐，
+        // 小字一变长色块就被推着左右跑（用户报过组态不对齐）。
+        C.el('td', { class: 'type-cell' }, [
           typeBlock(r.type),
           showGap
             ? C.el('span', { class: 'gap-mini', text: others })

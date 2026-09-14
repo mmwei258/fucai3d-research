@@ -254,7 +254,9 @@
       tbody.appendChild(C.el('tr', {}, [
         C.el('td', { class: 'num', text: r.issue }),
         C.el('td', { class: 'num draw-num', text: r.number }),
-        C.el('td', {}, [
+        // 加 type-cell：这一栏是"色块 + 深浅不一的小字"，若按表格默认的右对齐，
+        // 小字一变长色块就被推着左右跑（用户报过组态不对齐）。
+        C.el('td', { class: 'type-cell' }, [
           typeBlock(r.type),
           showGap
             ? C.el('span', { class: 'gap-mini', text: others })
