@@ -4,13 +4,13 @@
   "lottery": "福彩3D",
   "range": {
     "dayStart": "2013-01-02",
-    "dayEnd": "2026-09-13"
+    "dayEnd": "2026-09-14"
   },
-  "actual_total_records": 4751,
+  "actual_total_records": 4752,
   "first_issue": "2013002",
-  "last_issue": "2026246",
+  "last_issue": "2026247",
   "first_date": "2013-01-02",
-  "last_date": "2026-09-13",
+  "last_date": "2026-09-14",
   "train_history_path": "D:\\fucai3d-research\\data\\all\\history_official_all_train.json",
   "full_history_path": "D:\\fucai3d-research\\data\\all\\history_official_all_full.json",
   "features_path": "D:\\fucai3d-research\\data\\all\\history_official_all_features.json",
