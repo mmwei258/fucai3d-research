@@ -476,6 +476,51 @@
   // ---------- 计算与结果 ----------
   let LAST = null;            // 最近一次算出的结果，导出清单时直接用它，保证与屏幕一致
 
+  /* 覆盖号码列表：默认只列前 200 个，剩下的点「还有 N 个」按 200 个一档展开。
+     970 个号码一次性铺开在手机上会又长又卡，所以分成几档；展开状态存在 LAST 里，
+     改选号/筛选条件时自然重置（那份列表本来也变了）。 */
+  const LIST_CAP = 200;
+  function numListBlock(all) {
+    const wrap = C.el('div');
+    const head = C.el('h3');
+    const list = C.el('div', { class: 'num-list' });
+    const tail = C.el('div', { style: 'margin-top:10px' });
+
+    function paint() {
+      const cap = Math.max(LIST_CAP, LAST.listCap || LIST_CAP);
+      C.clear(list);
+      C.clear(tail);
+      head.textContent = '覆盖号码（共 ' + all.length + ' 个' +
+        (all.length > cap ? '，下列前 ' + cap + ' 个' : '') + '）';
+      all.slice(0, cap).forEach(function (x) {
+        list.appendChild(C.el('span', { class: 'num-chip', text: x }));
+      });
+      if (all.length > cap) {
+        const rest = all.length - cap;
+        tail.appendChild(C.el('button', {
+          class: 'more-btn',
+          text: '还有 ' + rest + ' 个 · 点这里展开' + (rest > LIST_CAP ? '（每次 ' + LIST_CAP + ' 个）' : ''),
+          onclick: function () {
+            LAST.listCap = Math.min(all.length, cap + LIST_CAP);
+            paint();
+          }
+        }));
+      } else if (cap > LIST_CAP) {
+        tail.appendChild(C.el('button', {
+          class: 'more-btn ghost',
+          text: '收起（只显示前 ' + LIST_CAP + ' 个）',
+          onclick: function () { LAST.listCap = LIST_CAP; paint(); }
+        }));
+      }
+    }
+
+    paint();
+    wrap.appendChild(head);
+    wrap.appendChild(list);
+    wrap.appendChild(tail);
+    return wrap;
+  }
+
   function calc() {
     computeLimits();          // 先把输入框里的值过一遍范围校验，越界的一律不参与筛选
     const pool = baseDirect();
@@ -635,23 +680,11 @@
     detail.appendChild(tb);
     box.appendChild(C.tableScroll(detail));
 
-    // ---- 覆盖号码：全部列出（上限 200，超过则标注剩余数量）----
-    const CAP = 200;
+    // ---- 覆盖号码：先列前 200 个，其余点一下展开（每次多 200 个）----
     const all = direct.concat(g6, g3);
-    box.appendChild(C.el('h3', {
-      text: '覆盖号码（共 ' + all.length + ' 个' +
-            (all.length > CAP ? '，下列前 ' + CAP + ' 个' : '') + '）'
-    }));
-    const list = C.el('div', { class: 'num-list' });
-    all.slice(0, CAP).forEach(function (x) {
-      list.appendChild(C.el('span', { class: 'num-chip', text: x }));
-    });
-    if (all.length > CAP) {
-      list.appendChild(C.el('span', {
-        class: 'num-chip more', text: '还有 ' + (all.length - CAP) + ' 个'
-      }));
-    }
-    box.appendChild(list);
+    LAST.all = all;
+    LAST.listCap = LIST_CAP;
+    box.appendChild(numListBlock(all));
 
     // ---- 核心：把"过滤不等于省钱"讲明白 ----
     // 只有真的剔除了号码才说"缩小范围"，否则会出现"从 18 注缩到 18 注"这种废话
