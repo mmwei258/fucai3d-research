@@ -37,9 +37,32 @@ python3 tool/extract_data.py
 python3 tool/build.py
 ```
 
-产物写到 `../outputs/福彩3D数据工具箱.html`，发布时复制为 `docs/index.html`。
+产物默认写到 `../docs/index.html`（GitHub Pages 直接发布这个文件）。
+要写到别处用 `--out`：`python3 tool/build.py --out /tmp/preview.html`。
 
 > `tool/data.js` 由 `extract_data.py` 生成，**不纳入版本管理**。
+
+## 数据怎么更新（重点）
+
+**一条命令**：抓最新开奖 → 重建数据集 → 重建网页
+
+```bash
+python scripts/refresh_all.py            # 联网抓取 + 重建（约 30 秒）
+python scripts/refresh_all.py --offline  # 不联网，只用现有 data/raw 重建（约 5 秒）
+python scripts/refresh_all.py --report   # 顺带跑回测与 7 天报表
+```
+
+Windows 上双击 **`更新网页数据.bat`** 等同于上面第一条；`一键运行.bat` 会把
+抓取、数据集、回测、报表、网页全部跑一遍。
+
+**自动更新**：`.github/workflows/update-data.yml` 每天北京时间 23:00 在 GitHub 上
+跑一次 `scripts/refresh_all.py`，有新数据就自动提交，GitHub Pages 随之重新发布。
+也可以在仓库的 Actions 页面点「Run workflow」手动触发。
+如果官方接口对境外 IP 不友好导致失败，Actions 会直接把这次运行标红（并给你发通知），
+这时用本地那条命令更新、再 `git push` 即可。
+
+**页面上的时效提示**：概览页会显示「本页构建于 …」；如果数据截止日比今天落后
+8 天以上，页面顶部会自动出现一条黄色提示，告诉你该更新了。
 
 ## 结构
 

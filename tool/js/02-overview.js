@@ -15,6 +15,16 @@
     ]);
   }
 
+  /* 数据时效自检：3D 每天开一期，"数据截止日"离今天明显超过一周基本就是没更新。
+     春节/国庆休市期间（连续 7~10 天不开奖）属正常，所以阈值放到 8 天，避免误报。
+     now 参数只给测试用，页面上不传。 */
+  function staleInfo(lastDate, now) {
+    const t = now === undefined ? Date.now() : now;
+    const end = new Date(lastDate + 'T23:59:59').getTime();
+    const gap = Math.floor((t - end) / 86400000);
+    return { gap: gap, stale: gap >= 8 };
+  }
+
   function render() {
     if (done) return;
     done = true;
@@ -23,6 +33,22 @@
     C.$('#ov-range').textContent =
       '共 ' + C.comma(D.length) + ' 期，' + first.date + ' ~ ' + last.date +
       '（第 ' + first.issue + ' ~ ' + last.issue + ' 期）';
+
+    const box = C.$('#ov-stale');
+    if (box) {
+      const info = staleInfo(last.date);
+      if (!info.stale) {
+        box.className = 'note warn hidden';
+      } else {
+        box.className = 'note warn';
+        box.innerHTML =
+          '<b>这份数据可能不是最新的：数据截止 ' + last.date + '（第 ' + last.issue +
+          ' 期），距今约 ' + info.gap + ' 天。</b>' +
+          '春节、国庆休市期间出现这种情况是正常的；如果不是休市，' +
+          '请在仓库里运行 <code>python scripts/refresh_all.py</code> 抓取最新开奖并重建页面' +
+          '（Windows 上双击 <code>更新网页数据.bat</code> 也可以）。';
+      }
+    }
 
     // 时间跨度（天）
     const days = Math.round((new Date(last.date) - new Date(first.date)) / 86400000) + 1;
@@ -89,5 +115,5 @@
     });
   }
 
-  window.OV = { render: render };
+  window.OV = { render: render, _stale: staleInfo };
 })();

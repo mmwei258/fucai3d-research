@@ -1,0 +1,52 @@
+name: 每日更新开奖数据
+
+# 福彩3D 每天 21:15 开奖，这里用北京时间 23:00（= UTC 15:00）抓当天的号，
+# 抓完重建数据集和网页并提交，GitHub Pages 会自动重新发布。
+on:
+  schedule:
+    - cron: '0 15 * * *'
+  workflow_dispatch:      # 也可以在 Actions 页面点「Run workflow」手动跑一次
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-data
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: 取出仓库
+        uses: actions/checkout@v4
+
+      - name: 安装 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 抓取开奖并重建网页
+        run: python scripts/refresh_all.py
+
+      - name: 提交变化
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A data docs
+          if git diff --cached --quiet; then
+            echo "没有新数据，跳过提交。"
+            exit 0
+          fi
+          LAST=$(python - <<'PY'
+          import json, pathlib
+          rows = json.loads(pathlib.Path('data/all/history_official_all_features.json').read_text(encoding='utf-8'))
+          last = rows[-1]
+          print(f"{last['issue']} ({last['date']} 开 {last['number']})")
+          PY
+          )
+          git commit -m "chore(data): 自动更新开奖数据至 ${LAST}"
+          git push
+          echo "已提交并推送：${LAST}"

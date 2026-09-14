@@ -2,14 +2,24 @@
 
 输出 data.js：const FUCAI3D_DATA = [[期号, 日期, 号码, 销售额万], ...]
 按时间正序排列（最旧 -> 最新）。
+
+用法：
+    python tool/extract_data.py                # 默认写到 tool/data.js
+    python tool/extract_data.py --out 别的.js
 """
 
+import argparse
 import json
 from pathlib import Path
 
-REPO = Path(r"D:\fucai3d-research")
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parent
 SRC = REPO / "data/all/history_official_all_features.json"
-OUT = Path(r"D:\Codex\2026-09-13\dt-x20\work\mvp\data.js")
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--out", default=str(HERE / "data.js"), help="输出 data.js 路径")
+args = ap.parse_args()
+OUT = Path(args.out).resolve()
 
 rows = json.loads(SRC.read_text(encoding="utf-8"))
 

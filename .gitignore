@@ -1,3 +1,5 @@
 __pycache__/
 *.pyc
 .DS_Store
+# 由 tool/extract_data.py 生成，每次构建重建，不纳入版本管理
+tool/data.js
