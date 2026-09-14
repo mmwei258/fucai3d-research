@@ -182,6 +182,22 @@ Windows 下也可直接双击仓库根目录的 [`一键运行.bat`](./一键运
 
 > 顺序有依赖：第 4 步从第 3 步的报告中读取 `selected_config`，请勿跳过回测直接跑预测。
 
+### 自动更新（每天一次）
+
+```bash
+# 抓最新开奖 -> 重建数据集 -> 重建网页 -> 提交并推送到 GitHub
+python3 scripts/auto_update_push.py
+```
+
+Windows 下双击 [`更新并发布.bat`](./更新并发布.bat) 等价，日志写在 `logs/auto_update.log`。
+
+> **为什么不用 GitHub Actions 定时跑**：官方接口 `www.cwl.gov.cn` 拒绝境外 IP。
+> 2026-09-14 手动触发过一次 workflow，日志是
+> `抓取失败（已重试 4 次）: HTTP Error 403: Forbidden` —— GitHub 的服务器在美国，
+> 拿不到数据。所以 `.github/workflows/update-data.yml` 里没有配 `schedule`，
+> 只保留手动触发；日常定时更新放在本机（国内网络）跑。
+> 抓取失败时脚本会立刻停止，**不会**提交任何东西，所以不会污染仓库。
+
 ---
 
 ## 目录结构

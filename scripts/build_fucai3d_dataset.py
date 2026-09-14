@@ -25,6 +25,39 @@ PRIMES = {2, 3, 5, 7}
 WEEK_MAP = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '日': 7, '天': 7}
 
 
+def _strip_ts(row):
+    """去掉时间戳后的记录，用来比较"内容到底变没变"。"""
+    return {k: v for k, v in row.items() if k != 'updated_at'}
+
+
+def load_previous_rows(path):
+    """上一次转储的记录，按期号索引。"""
+    if not path.exists():
+        return {}
+    try:
+        rows = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return {}
+    if not isinstance(rows, list):
+        return {}
+    return {str(r.get('issue', '')): r for r in rows if isinstance(r, dict)}
+
+
+def stamp_updated_at(row, prev_rows, now):
+    """盖时间戳：内容和上一次完全一样就沿用旧时间。
+
+    重建时无脑给每条记录盖"当前时间"，会让四千多期的 updated_at 全部翻新，
+    提交历史里全是这种噪音（真实开奖数据一行没变）。只有新增的、或内容
+    有改动的记录才盖新时间。
+    """
+    old = prev_rows.get(row.get('issue'))
+    if isinstance(old, dict) and _strip_ts(old) == _strip_ts(row):
+        row['updated_at'] = old.get('updated_at', now)
+    else:
+        row['updated_at'] = now
+    return row
+
+
 def decode_u(text):
     text = str(text)
     return U_RE.sub(lambda m: chr(int(m.group(1), 16)), text)
@@ -228,6 +261,7 @@ def main():
         raise SystemExit(f'parsed too few records: {len(raw_records)}')
 
     now = datetime.now(UTC).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+    prev_rows = load_previous_rows(OUT_FULL)
     full = []
     for r in raw_records:
         red = str(r.get('red', ''))
@@ -264,6 +298,8 @@ def main():
         })
 
     full = sorted({r['issue']: r for r in full}.values(), key=lambda x: int(x['issue']))
+    for r in full:
+        stamp_updated_at(r, prev_rows, now)
     features = build_feature_rows(full)
     train = [
         {

@@ -1,10 +1,13 @@
 name: 每日更新开奖数据
 
-# 福彩3D 每天 21:15 开奖，这里用北京时间 23:00（= UTC 15:00）抓当天的号，
-# 抓完重建数据集和网页并提交，GitHub Pages 会自动重新发布。
+# ⚠️ 这里刻意没有配 schedule（定时触发），原因是实测不行：
+#     官方接口 www.cwl.gov.cn 会拒绝境外 IP。2026-09-14 手动跑过一次，
+#     日志里是「抓取失败（已重试 4 次）: HTTP Error 403: Forbidden」，
+#     GitHub 的服务器在美国，拿不到数据。定时跑只会每天失败发一封邮件。
+#   现在的自动更新由本机（国内网络）的计划任务负责：
+#     scripts/auto_update_push.py + 更新并发布.bat
+#   这个 workflow 保留手动触发，换网络环境或临时补数据时可以用。
 on:
-  schedule:
-    - cron: '0 15 * * *'
   workflow_dispatch:      # 也可以在 Actions 页面点「Run workflow」手动跑一次
 
 permissions:

@@ -64,8 +64,10 @@ def main():
         print('模式：离线重建（不抓取新数据）')
 
     if not args.offline:
+        # 必须抓 all + 2y 两份转储：下面两个数据集分别从各自的转储重建，
+        # 只抓 all 会让"近两年"数据集永远停在旧的一期上。
         run('[1/5] 抓取最新开奖（中国福彩网官方接口）',
-            ['scripts/fetch_official_dump.py', '--mode', 'all'])
+            ['scripts/fetch_official_dump.py', '--mode', 'both'])
     else:
         print('\n[1/5] 跳过抓取（--offline）')
 

@@ -33,6 +33,7 @@ def main():
         raise SystemExit(f'parsed too few records: {len(raw_records)}')
 
     now = datetime.now(UTC).replace(microsecond=0).isoformat().replace('+00:00', 'Z')
+    prev_rows = base.load_previous_rows(OUT_FULL)
     full = []
     for r in raw_records:
         red = str(r.get('red', ''))
@@ -69,6 +70,8 @@ def main():
         })
 
     full = sorted({r['issue']: r for r in full}.values(), key=lambda x: int(x['issue']))
+    for r in full:
+        base.stamp_updated_at(r, prev_rows, now)
     features = base.build_feature_rows(full)
     train = [
         {
