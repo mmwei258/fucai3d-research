@@ -9,6 +9,62 @@
         addmoney2 = "";
         blue = "";
         blue2 = "";
+        code = 2026253;
+        content = "";
+        date = "2026-09-20(\U65e5)";
+        detailsLink = "/c/2026/09/20/668011.shtml";
+        m2add = "";
+        msg = "";
+        name = 3D;
+        poolmoney = "";
+        prizegrades =         (
+                        {
+                type = 1;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 2;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 3;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 4;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 5;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 6;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 7;
+                typemoney = "";
+                typenum = "";
+            }
+        );
+        red = "0,3,4";
+        sales = 104791332;
+        videoLink = "";
+        week = "\U65e5";
+        z2add = "";
+    },
+        {
+        addmoney = "";
+        addmoney2 = "";
+        blue = "";
+        blue2 = "";
         code = 2026252;
         content = "";
         date = "2026-09-19(\U516d)";
@@ -266398,4 +266454,4 @@
     }
 )
   state: 0
-  total: 4757
+  total: 4758
