@@ -3,14 +3,14 @@
   "endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
   "lottery": "福彩3D",
   "range": {
-    "dayStart": "2024-09-21",
-    "dayEnd": "2026-09-22"
+    "dayStart": "2024-09-22",
+    "dayEnd": "2026-09-23"
   },
   "total_records": 704,
-  "first_issue": "2024255",
-  "last_issue": "2026255",
-  "first_date": "2024-09-21",
-  "last_date": "2026-09-22",
+  "first_issue": "2024256",
+  "last_issue": "2026256",
+  "first_date": "2024-09-22",
+  "last_date": "2026-09-23",
   "train_history_path": "D:\\fucai3d-research\\data\\2y\\history.json",
   "full_history_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_full.json",
   "features_path": "D:\\fucai3d-research\\data\\2y\\history_official_2y_features.json",
