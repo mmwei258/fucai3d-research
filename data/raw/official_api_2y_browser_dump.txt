@@ -39315,63 +39315,7 @@
         videoLink = "/c/2024/10/05/590562.shtml";
         week = "\U516d";
         z2add = "";
-    },
-        {
-        addmoney = "";
-        addmoney2 = "";
-        blue = "";
-        blue2 = "";
-        code = 2024264;
-        content = "";
-        date = "2024-09-30(\U4e00)";
-        detailsLink = "/c/2024/09/30/590453.shtml";
-        m2add = "";
-        msg = "";
-        name = 3D;
-        poolmoney = "";
-        prizegrades =         (
-                        {
-                type = 1;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 2;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 3;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 4;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 5;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 6;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 7;
-                typemoney = "";
-                typenum = "";
-            }
-        );
-        red = "7,1,0";
-        sales = 121034158;
-        videoLink = "";
-        week = "\U4e00";
-        z2add = "";
     }
 )
   state: 0
-  total: 703
+  total: 702
