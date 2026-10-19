@@ -315610,5 +315610,71 @@
       }
     ],
     "updated_at": "2026-10-18T15:10:22Z"
+  },
+  {
+    "source": "cwl.gov.cn official API",
+    "source_endpoint": "https://www.cwl.gov.cn/cwl_admin/front/cwlkj/search/kjxx/findDrawNotice",
+    "name": "3D",
+    "issue": "2026278",
+    "date": "2026-10-19",
+    "date_raw": "2026-10-19(一)",
+    "week": "一",
+    "number": "666",
+    "red": "6,6,6",
+    "digits": [
+      6,
+      6,
+      6
+    ],
+    "blue": "",
+    "blue2": "",
+    "sales": 104768858,
+    "poolmoney": "",
+    "content": "",
+    "addmoney": "",
+    "addmoney2": "",
+    "msg": "",
+    "z2add": "",
+    "m2add": "",
+    "detailsLink": "https://www.cwl.gov.cn/c/2026/10/19/670381.shtml",
+    "videoLink": "",
+    "prizegrades": [
+      {
+        "type": 1,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 2,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 3,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 4,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 5,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 6,
+        "typemoney": "",
+        "typenum": ""
+      },
+      {
+        "type": 7,
+        "typemoney": "",
+        "typenum": ""
+      }
+    ],
+    "updated_at": "2026-10-19T16:27:17Z"
   }
 ]
