@@ -1,109 +1,5 @@
 [
   {
-    "issue": "2024281",
-    "date": "2024-10-21",
-    "year": 2024,
-    "month": 10,
-    "day": 21,
-    "weekday_cn": "一",
-    "weekday_num": 1,
-    "day_of_year": 295,
-    "name": "3D",
-    "number": "900",
-    "red": "9,0,0",
-    "d1": 9,
-    "d2": 0,
-    "d3": 0,
-    "digits": [
-      9,
-      0,
-      0
-    ],
-    "sorted_digits": [
-      0,
-      0,
-      9
-    ],
-    "sorted_number": "009",
-    "unique_count": 2,
-    "repeat_type": "组三",
-    "has_pair": true,
-    "has_triple": false,
-    "sum": 9,
-    "sum_tail": 9,
-    "span": 9,
-    "max_digit": 9,
-    "min_digit": 0,
-    "odd_count": 1,
-    "even_count": 2,
-    "big_count": 1,
-    "small_count": 2,
-    "prime_count": 0,
-    "non_prime_count": 3,
-    "route0_count": 3,
-    "route1_count": 0,
-    "route2_count": 0,
-    "route_pattern": "000",
-    "odd_even_pattern": "OEE",
-    "big_small_pattern": "BSS",
-    "prime_pattern": "NNN",
-    "adjacent_consecutive_count": 0,
-    "adjacent_same_count": 1,
-    "ac_value": 0,
-    "sales": 113029256,
-    "sales_wan": 11302.9256,
-    "has_video": false,
-    "detailsLink": "https://www.cwl.gov.cn/c/2024/10/21/591866.shtml",
-    "videoLink": "",
-    "prev_issue": null,
-    "prev_number": null,
-    "prev_sum": null,
-    "prev_span": null,
-    "prev_repeat_type": null,
-    "issue_gap_from_prev": null,
-    "day_gap_from_prev": null,
-    "sales_delta_from_prev": null,
-    "same_position_hits_prev": null,
-    "shared_digits_prev": null,
-    "prev30_window_size": 0,
-    "prev30_hot_digits": [
-      0,
-      1,
-      2
-    ],
-    "prev30_cold_digits": [
-      0,
-      1,
-      2
-    ],
-    "prev30_sum_avg": null,
-    "prev30_span_avg": null,
-    "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 0,
-    "prev30_repeat_zuliu": 0,
-    "updated_at": "2026-09-14T13:53:04Z",
-    "digit_0_count": 2,
-    "prev30_digit_0_freq": 0,
-    "digit_1_count": 0,
-    "prev30_digit_1_freq": 0,
-    "digit_2_count": 0,
-    "prev30_digit_2_freq": 0,
-    "digit_3_count": 0,
-    "prev30_digit_3_freq": 0,
-    "digit_4_count": 0,
-    "prev30_digit_4_freq": 0,
-    "digit_5_count": 0,
-    "prev30_digit_5_freq": 0,
-    "digit_6_count": 0,
-    "prev30_digit_6_freq": 0,
-    "digit_7_count": 0,
-    "prev30_digit_7_freq": 0,
-    "digit_8_count": 0,
-    "prev30_digit_8_freq": 0,
-    "digit_9_count": 1,
-    "prev30_digit_9_freq": 0
-  },
-  {
     "issue": "2024282",
     "date": "2024-10-22",
     "year": 2024,
@@ -159,35 +55,35 @@
     "has_video": false,
     "detailsLink": "https://www.cwl.gov.cn/c/2024/10/22/591973.shtml",
     "videoLink": "",
-    "prev_issue": "2024281",
-    "prev_number": "900",
-    "prev_sum": 9,
-    "prev_span": 9,
-    "prev_repeat_type": "组三",
-    "issue_gap_from_prev": 1,
-    "day_gap_from_prev": 1,
-    "sales_delta_from_prev": -2969848,
-    "same_position_hits_prev": 1,
-    "shared_digits_prev": 1,
-    "prev30_window_size": 1,
+    "prev_issue": null,
+    "prev_number": null,
+    "prev_sum": null,
+    "prev_span": null,
+    "prev_repeat_type": null,
+    "issue_gap_from_prev": null,
+    "day_gap_from_prev": null,
+    "sales_delta_from_prev": null,
+    "same_position_hits_prev": null,
+    "shared_digits_prev": null,
+    "prev30_window_size": 0,
     "prev30_hot_digits": [
       0,
-      9,
-      1
+      1,
+      2
     ],
     "prev30_cold_digits": [
+      0,
       1,
-      2,
-      3
+      2
     ],
-    "prev30_sum_avg": 9.0,
-    "prev30_span_avg": 9.0,
+    "prev30_sum_avg": null,
+    "prev30_span_avg": null,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 0,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 0,
     "digit_2_count": 0,
@@ -205,7 +101,7 @@
     "digit_8_count": 1,
     "prev30_digit_8_freq": 0,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 1
+    "prev30_digit_9_freq": 0
   },
   {
     "issue": "2024283",
@@ -273,25 +169,25 @@
     "sales_delta_from_prev": 268668,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 2,
+    "prev30_window_size": 1,
     "prev30_hot_digits": [
-      0,
-      9,
-      3
+      3,
+      8,
+      9
     ],
     "prev30_cold_digits": [
+      0,
       1,
-      2,
-      4
+      2
     ],
-    "prev30_sum_avg": 14.5,
-    "prev30_span_avg": 7.5,
+    "prev30_sum_avg": 20.0,
+    "prev30_span_avg": 6.0,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 1,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 0,
     "digit_2_count": 0,
@@ -309,7 +205,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 1,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 2
+    "prev30_digit_9_freq": 1
   },
   {
     "issue": "2024284",
@@ -377,25 +273,25 @@
     "sales_delta_from_prev": 3769018,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 3,
+    "prev30_window_size": 2,
     "prev30_hot_digits": [
       9,
-      0,
-      1
+      1,
+      3
     ],
     "prev30_cold_digits": [
+      0,
       2,
-      5,
-      6
+      5
     ],
-    "prev30_sum_avg": 14.3333,
-    "prev30_span_avg": 7.6667,
+    "prev30_sum_avg": 17.0,
+    "prev30_span_avg": 7.0,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 2,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 1,
     "digit_2_count": 1,
@@ -413,7 +309,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 1,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 3
+    "prev30_digit_9_freq": 2
   },
   {
     "issue": "2024285",
@@ -481,25 +377,25 @@
     "sales_delta_from_prev": -596272,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 4,
+    "prev30_window_size": 3,
     "prev30_hot_digits": [
-      9,
-      0,
-      3
+      3,
+      4,
+      9
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 13.0,
-    "prev30_span_avg": 6.25,
+    "prev30_sum_avg": 14.3333,
+    "prev30_span_avg": 5.3333,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 3,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 1,
     "digit_2_count": 0,
@@ -517,7 +413,7 @@
     "digit_8_count": 1,
     "prev30_digit_8_freq": 1,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 3
+    "prev30_digit_9_freq": 2
   },
   {
     "issue": "2024286",
@@ -585,25 +481,25 @@
     "sales_delta_from_prev": -3850788,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 5,
+    "prev30_window_size": 4,
     "prev30_hot_digits": [
-      9,
-      0,
-      1
+      1,
+      3,
+      4
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      2
+      6
     ],
-    "prev30_sum_avg": 13.6,
-    "prev30_span_avg": 6.4,
+    "prev30_sum_avg": 14.75,
+    "prev30_span_avg": 5.75,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 4,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 2,
     "digit_2_count": 1,
@@ -621,7 +517,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 2,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 3
+    "prev30_digit_9_freq": 2
   },
   {
     "issue": "2024287",
@@ -689,25 +585,25 @@
     "sales_delta_from_prev": 3451264,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 2,
-    "prev30_window_size": 6,
+    "prev30_window_size": 5,
     "prev30_hot_digits": [
       1,
-      9,
-      0
+      2,
+      3
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 12.8333,
-    "prev30_span_avg": 6.1667,
+    "prev30_sum_avg": 13.6,
+    "prev30_span_avg": 5.6,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 5,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 3,
     "digit_2_count": 1,
@@ -725,7 +621,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 2,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 3
+    "prev30_digit_9_freq": 2
   },
   {
     "issue": "2024288",
@@ -793,25 +689,25 @@
     "sales_delta_from_prev": 1554892,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 7,
+    "prev30_window_size": 6,
     "prev30_hot_digits": [
       1,
-      9,
-      2
+      2,
+      9
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 12.7143,
-    "prev30_span_avg": 6.4286,
+    "prev30_sum_avg": 13.3333,
+    "prev30_span_avg": 6.0,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 6,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 4,
     "digit_2_count": 0,
@@ -829,7 +725,7 @@
     "digit_8_count": 1,
     "prev30_digit_8_freq": 2,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 4
+    "prev30_digit_9_freq": 3
   },
   {
     "issue": "2024289",
@@ -897,25 +793,25 @@
     "sales_delta_from_prev": 2830142,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 2,
-    "prev30_window_size": 8,
+    "prev30_window_size": 7,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       2
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 13.625,
-    "prev30_span_avg": 6.375,
+    "prev30_sum_avg": 14.2857,
+    "prev30_span_avg": 6.0,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 1,
+    "prev30_repeat_zusan": 0,
     "prev30_repeat_zuliu": 7,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 4,
     "digit_2_count": 0,
@@ -933,7 +829,7 @@
     "digit_8_count": 1,
     "prev30_digit_8_freq": 3,
     "digit_9_count": 2,
-    "prev30_digit_9_freq": 5
+    "prev30_digit_9_freq": 4
   },
   {
     "issue": "2024290",
@@ -1001,25 +897,25 @@
     "sales_delta_from_prev": -7618838,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 1,
-    "prev30_window_size": 9,
+    "prev30_window_size": 8,
     "prev30_hot_digits": [
       9,
       1,
       8
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 15.0,
-    "prev30_span_avg": 5.7778,
+    "prev30_sum_avg": 15.75,
+    "prev30_span_avg": 5.375,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 2,
+    "prev30_repeat_zusan": 1,
     "prev30_repeat_zuliu": 7,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 2,
     "prev30_digit_1_freq": 4,
     "digit_2_count": 0,
@@ -1037,7 +933,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 7
+    "prev30_digit_9_freq": 6
   },
   {
     "issue": "2024291",
@@ -1105,25 +1001,25 @@
     "sales_delta_from_prev": 378780,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 10,
+    "prev30_window_size": 9,
     "prev30_hot_digits": [
       9,
       1,
       8
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      6,
-      7
+      6
     ],
-    "prev30_sum_avg": 14.6,
-    "prev30_span_avg": 6.0,
+    "prev30_sum_avg": 15.2222,
+    "prev30_span_avg": 5.6667,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 7,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 6,
     "digit_2_count": 1,
@@ -1141,7 +1037,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024292",
@@ -1209,25 +1105,25 @@
     "sales_delta_from_prev": 4192872,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 3,
-    "prev30_window_size": 11,
+    "prev30_window_size": 10,
     "prev30_hot_digits": [
       9,
       1,
       2
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      7,
-      0
+      7
     ],
-    "prev30_sum_avg": 14.3636,
-    "prev30_span_avg": 5.8182,
+    "prev30_sum_avg": 14.9,
+    "prev30_span_avg": 5.5,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 8,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 6,
     "digit_2_count": 1,
@@ -1245,7 +1141,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024293",
@@ -1313,25 +1209,25 @@
     "sales_delta_from_prev": -8876212,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 12,
+    "prev30_window_size": 11,
     "prev30_hot_digits": [
       9,
       1,
       2
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      7,
-      0
+      7
     ],
-    "prev30_sum_avg": 14.1667,
-    "prev30_span_avg": 5.6667,
+    "prev30_sum_avg": 14.6364,
+    "prev30_span_avg": 5.3636,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 9,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 6,
     "digit_2_count": 1,
@@ -1349,7 +1245,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024294",
@@ -1417,25 +1313,25 @@
     "sales_delta_from_prev": -835218,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 13,
+    "prev30_window_size": 12,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       2
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      7,
-      0
+      7
     ],
-    "prev30_sum_avg": 13.6923,
-    "prev30_span_avg": 5.5385,
+    "prev30_sum_avg": 14.0833,
+    "prev30_span_avg": 5.25,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 10,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 7,
     "digit_2_count": 0,
@@ -1453,7 +1349,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024295",
@@ -1521,25 +1417,25 @@
     "sales_delta_from_prev": 4027392,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 14,
+    "prev30_window_size": 13,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       2
     ],
     "prev30_cold_digits": [
+      0,
       5,
-      7,
-      0
+      7
     ],
-    "prev30_sum_avg": 13.6429,
-    "prev30_span_avg": 5.3571,
+    "prev30_sum_avg": 14.0,
+    "prev30_span_avg": 5.0769,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 11,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 7,
     "digit_2_count": 0,
@@ -1557,7 +1453,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024296",
@@ -1625,7 +1521,7 @@
     "sales_delta_from_prev": 1109770,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 15,
+    "prev30_window_size": 14,
     "prev30_hot_digits": [
       1,
       9,
@@ -1636,14 +1532,14 @@
       5,
       7
     ],
-    "prev30_sum_avg": 13.6,
-    "prev30_span_avg": 5.4,
+    "prev30_sum_avg": 13.9286,
+    "prev30_span_avg": 5.1429,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 12,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 8,
     "digit_2_count": 0,
@@ -1661,7 +1557,7 @@
     "digit_8_count": 1,
     "prev30_digit_8_freq": 4,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024297",
@@ -1729,7 +1625,7 @@
     "sales_delta_from_prev": 2102628,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 16,
+    "prev30_window_size": 15,
     "prev30_hot_digits": [
       1,
       9,
@@ -1740,14 +1636,14 @@
       5,
       7
     ],
-    "prev30_sum_avg": 13.6875,
-    "prev30_span_avg": 5.5,
+    "prev30_sum_avg": 14.0,
+    "prev30_span_avg": 5.2667,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 13,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 1,
@@ -1765,7 +1661,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024298",
@@ -1833,25 +1729,25 @@
     "sales_delta_from_prev": 962490,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 17,
+    "prev30_window_size": 16,
     "prev30_hot_digits": [
       1,
-      9,
-      2
+      2,
+      9
     ],
     "prev30_cold_digits": [
       0,
       5,
       7
     ],
-    "prev30_sum_avg": 13.5882,
-    "prev30_span_avg": 5.4706,
+    "prev30_sum_avg": 13.875,
+    "prev30_span_avg": 5.25,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 3,
+    "prev30_repeat_zusan": 2,
     "prev30_repeat_zuliu": 14,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 1,
-    "prev30_digit_0_freq": 2,
+    "prev30_digit_0_freq": 0,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 0,
@@ -1869,7 +1765,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024299",
@@ -1937,25 +1833,25 @@
     "sales_delta_from_prev": -2672764,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 18,
+    "prev30_window_size": 17,
     "prev30_hot_digits": [
       1,
-      9,
-      2
+      2,
+      9
     ],
     "prev30_cold_digits": [
       0,
       7,
       5
     ],
-    "prev30_sum_avg": 13.3889,
-    "prev30_span_avg": 5.4444,
+    "prev30_sum_avg": 13.6471,
+    "prev30_span_avg": 5.2353,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 4,
+    "prev30_repeat_zusan": 3,
     "prev30_repeat_zuliu": 14,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 0,
@@ -1973,7 +1869,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 2,
-    "prev30_digit_9_freq": 8
+    "prev30_digit_9_freq": 7
   },
   {
     "issue": "2024300",
@@ -2041,10 +1937,10 @@
     "sales_delta_from_prev": -5267394,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 19,
+    "prev30_window_size": 18,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       2
     ],
     "prev30_cold_digits": [
@@ -2052,14 +1948,14 @@
       7,
       5
     ],
-    "prev30_sum_avg": 13.8421,
-    "prev30_span_avg": 5.4211,
+    "prev30_sum_avg": 14.1111,
+    "prev30_span_avg": 5.2222,
     "prev30_repeat_baozi": 0,
-    "prev30_repeat_zusan": 5,
+    "prev30_repeat_zusan": 4,
     "prev30_repeat_zuliu": 14,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 0,
@@ -2077,7 +1973,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 10
+    "prev30_digit_9_freq": 9
   },
   {
     "issue": "2024301",
@@ -2145,10 +2041,10 @@
     "sales_delta_from_prev": -7070664,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 0,
-    "prev30_window_size": 20,
+    "prev30_window_size": 19,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       6
     ],
     "prev30_cold_digits": [
@@ -2156,14 +2052,14 @@
       7,
       5
     ],
-    "prev30_sum_avg": 14.05,
-    "prev30_span_avg": 5.15,
+    "prev30_sum_avg": 14.3158,
+    "prev30_span_avg": 4.9474,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 5,
+    "prev30_repeat_zusan": 4,
     "prev30_repeat_zuliu": 14,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 0,
@@ -2181,7 +2077,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 10
+    "prev30_digit_9_freq": 9
   },
   {
     "issue": "2024302",
@@ -2249,10 +2145,10 @@
     "sales_delta_from_prev": 10401908,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 21,
+    "prev30_window_size": 20,
     "prev30_hot_digits": [
-      9,
       1,
+      9,
       6
     ],
     "prev30_cold_digits": [
@@ -2260,14 +2156,14 @@
       7,
       5
     ],
-    "prev30_sum_avg": 13.9524,
-    "prev30_span_avg": 5.0,
+    "prev30_sum_avg": 14.2,
+    "prev30_span_avg": 4.8,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 5,
+    "prev30_repeat_zusan": 4,
     "prev30_repeat_zuliu": 15,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 9,
     "digit_2_count": 0,
@@ -2285,7 +2181,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 10
+    "prev30_digit_9_freq": 9
   },
   {
     "issue": "2024303",
@@ -2353,25 +2249,25 @@
     "sales_delta_from_prev": 1886534,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 1,
-    "prev30_window_size": 22,
+    "prev30_window_size": 21,
     "prev30_hot_digits": [
       1,
-      9,
-      6
+      6,
+      9
     ],
     "prev30_cold_digits": [
       0,
       7,
       8
     ],
-    "prev30_sum_avg": 13.8636,
-    "prev30_span_avg": 5.0,
+    "prev30_sum_avg": 14.0952,
+    "prev30_span_avg": 4.8095,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 5,
+    "prev30_repeat_zusan": 4,
     "prev30_repeat_zuliu": 16,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 10,
     "digit_2_count": 0,
@@ -2389,7 +2285,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 10
+    "prev30_digit_9_freq": 9
   },
   {
     "issue": "2024304",
@@ -2457,7 +2353,7 @@
     "sales_delta_from_prev": -875558,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 23,
+    "prev30_window_size": 22,
     "prev30_hot_digits": [
       1,
       6,
@@ -2468,14 +2364,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 13.7826,
-    "prev30_span_avg": 4.913,
+    "prev30_sum_avg": 14.0,
+    "prev30_span_avg": 4.7273,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 6,
+    "prev30_repeat_zusan": 5,
     "prev30_repeat_zuliu": 16,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 1,
     "prev30_digit_1_freq": 10,
     "digit_2_count": 0,
@@ -2493,7 +2389,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 10
+    "prev30_digit_9_freq": 9
   },
   {
     "issue": "2024305",
@@ -2561,7 +2457,7 @@
     "sales_delta_from_prev": 700222,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 2,
-    "prev30_window_size": 24,
+    "prev30_window_size": 23,
     "prev30_hot_digits": [
       1,
       6,
@@ -2572,14 +2468,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 13.875,
-    "prev30_span_avg": 5.0417,
+    "prev30_sum_avg": 14.087,
+    "prev30_span_avg": 4.8696,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 6,
+    "prev30_repeat_zusan": 5,
     "prev30_repeat_zuliu": 17,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -2597,7 +2493,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 11
+    "prev30_digit_9_freq": 10
   },
   {
     "issue": "2024306",
@@ -2665,25 +2561,25 @@
     "sales_delta_from_prev": -1188010,
     "same_position_hits_prev": 1,
     "shared_digits_prev": 2,
-    "prev30_window_size": 25,
+    "prev30_window_size": 24,
     "prev30_hot_digits": [
       6,
-      9,
-      1
+      1,
+      9
     ],
     "prev30_cold_digits": [
       0,
       7,
       8
     ],
-    "prev30_sum_avg": 14.16,
-    "prev30_span_avg": 4.96,
+    "prev30_sum_avg": 14.375,
+    "prev30_span_avg": 4.7917,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 17,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 1,
@@ -2701,7 +2597,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 12
+    "prev30_digit_9_freq": 11
   },
   {
     "issue": "2024307",
@@ -2769,7 +2665,7 @@
     "sales_delta_from_prev": -1577246,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 26,
+    "prev30_window_size": 25,
     "prev30_hot_digits": [
       6,
       9,
@@ -2780,14 +2676,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 14.2692,
-    "prev30_span_avg": 5.0385,
+    "prev30_sum_avg": 14.48,
+    "prev30_span_avg": 4.88,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 18,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -2805,7 +2701,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 13
+    "prev30_digit_9_freq": 12
   },
   {
     "issue": "2024308",
@@ -2873,7 +2769,7 @@
     "sales_delta_from_prev": 1577568,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 27,
+    "prev30_window_size": 26,
     "prev30_hot_digits": [
       6,
       9,
@@ -2884,14 +2780,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 14.5185,
-    "prev30_span_avg": 5.0,
+    "prev30_sum_avg": 14.7308,
+    "prev30_span_avg": 4.8462,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 19,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -2909,7 +2805,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 14
+    "prev30_digit_9_freq": 13
   },
   {
     "issue": "2024309",
@@ -2977,7 +2873,7 @@
     "sales_delta_from_prev": 700722,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 28,
+    "prev30_window_size": 27,
     "prev30_hot_digits": [
       6,
       9,
@@ -2988,14 +2884,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 14.5357,
-    "prev30_span_avg": 4.8929,
+    "prev30_sum_avg": 14.7407,
+    "prev30_span_avg": 4.7407,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 20,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 0,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -3013,7 +2909,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 1,
-    "prev30_digit_9_freq": 14
+    "prev30_digit_9_freq": 13
   },
   {
     "issue": "2024310",
@@ -3081,7 +2977,7 @@
     "sales_delta_from_prev": 262488,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 1,
-    "prev30_window_size": 29,
+    "prev30_window_size": 28,
     "prev30_hot_digits": [
       6,
       9,
@@ -3092,14 +2988,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 14.6207,
-    "prev30_span_avg": 4.931,
+    "prev30_sum_avg": 14.8214,
+    "prev30_span_avg": 4.7857,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 21,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 1,
-    "prev30_digit_0_freq": 3,
+    "prev30_digit_0_freq": 1,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -3117,7 +3013,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 15
+    "prev30_digit_9_freq": 14
   },
   {
     "issue": "2024311",
@@ -3185,7 +3081,7 @@
     "sales_delta_from_prev": 243704,
     "same_position_hits_prev": 0,
     "shared_digits_prev": 2,
-    "prev30_window_size": 30,
+    "prev30_window_size": 29,
     "prev30_hot_digits": [
       6,
       9,
@@ -3196,14 +3092,14 @@
       7,
       8
     ],
-    "prev30_sum_avg": 14.4333,
-    "prev30_span_avg": 4.9667,
+    "prev30_sum_avg": 14.6207,
+    "prev30_span_avg": 4.8276,
     "prev30_repeat_baozi": 1,
-    "prev30_repeat_zusan": 7,
+    "prev30_repeat_zusan": 6,
     "prev30_repeat_zuliu": 22,
     "updated_at": "2026-09-14T13:53:04Z",
     "digit_0_count": 1,
-    "prev30_digit_0_freq": 4,
+    "prev30_digit_0_freq": 2,
     "digit_1_count": 0,
     "prev30_digit_1_freq": 11,
     "digit_2_count": 0,
@@ -3221,7 +3117,7 @@
     "digit_8_count": 0,
     "prev30_digit_8_freq": 5,
     "digit_9_count": 0,
-    "prev30_digit_9_freq": 15
+    "prev30_digit_9_freq": 14
   },
   {
     "issue": "2024312",
@@ -73212,6 +73108,110 @@
     "prev30_digit_7_freq": 9,
     "digit_8_count": 1,
     "prev30_digit_8_freq": 10,
+    "digit_9_count": 0,
+    "prev30_digit_9_freq": 10
+  },
+  {
+    "issue": "2026282",
+    "date": "2026-10-23",
+    "year": 2026,
+    "month": 10,
+    "day": 23,
+    "weekday_cn": "五",
+    "weekday_num": 5,
+    "day_of_year": 296,
+    "name": "3D",
+    "number": "300",
+    "red": "3,0,0",
+    "d1": 3,
+    "d2": 0,
+    "d3": 0,
+    "digits": [
+      3,
+      0,
+      0
+    ],
+    "sorted_digits": [
+      0,
+      0,
+      3
+    ],
+    "sorted_number": "003",
+    "unique_count": 2,
+    "repeat_type": "组三",
+    "has_pair": true,
+    "has_triple": false,
+    "sum": 3,
+    "sum_tail": 3,
+    "span": 3,
+    "max_digit": 3,
+    "min_digit": 0,
+    "odd_count": 1,
+    "even_count": 2,
+    "big_count": 0,
+    "small_count": 3,
+    "prime_count": 1,
+    "non_prime_count": 2,
+    "route0_count": 3,
+    "route1_count": 0,
+    "route2_count": 0,
+    "route_pattern": "000",
+    "odd_even_pattern": "OEE",
+    "big_small_pattern": "SSS",
+    "prime_pattern": "PNN",
+    "adjacent_consecutive_count": 0,
+    "adjacent_same_count": 1,
+    "ac_value": 0,
+    "sales": 108680926,
+    "sales_wan": 10868.0926,
+    "has_video": false,
+    "detailsLink": "https://www.cwl.gov.cn/c/2026/10/23/670909.shtml",
+    "videoLink": "",
+    "prev_issue": "2026281",
+    "prev_number": "813",
+    "prev_sum": 12,
+    "prev_span": 7,
+    "prev_repeat_type": "组六",
+    "issue_gap_from_prev": 1,
+    "day_gap_from_prev": 1,
+    "sales_delta_from_prev": 5588696,
+    "same_position_hits_prev": 0,
+    "shared_digits_prev": 1,
+    "prev30_window_size": 30,
+    "prev30_hot_digits": [
+      1,
+      6,
+      8
+    ],
+    "prev30_cold_digits": [
+      2,
+      7,
+      4
+    ],
+    "prev30_sum_avg": 13.4667,
+    "prev30_span_avg": 5.4,
+    "prev30_repeat_baozi": 1,
+    "prev30_repeat_zusan": 4,
+    "prev30_repeat_zuliu": 25,
+    "updated_at": "2026-10-23T15:42:11Z",
+    "digit_0_count": 2,
+    "prev30_digit_0_freq": 10,
+    "digit_1_count": 0,
+    "prev30_digit_1_freq": 13,
+    "digit_2_count": 0,
+    "prev30_digit_2_freq": 5,
+    "digit_3_count": 1,
+    "prev30_digit_3_freq": 9,
+    "digit_4_count": 0,
+    "prev30_digit_4_freq": 7,
+    "digit_5_count": 0,
+    "prev30_digit_5_freq": 8,
+    "digit_6_count": 0,
+    "prev30_digit_6_freq": 11,
+    "digit_7_count": 0,
+    "prev30_digit_7_freq": 6,
+    "digit_8_count": 0,
+    "prev30_digit_8_freq": 11,
     "digit_9_count": 0,
     "prev30_digit_9_freq": 10
   }
