@@ -9,6 +9,62 @@
         addmoney2 = "";
         blue = "";
         blue2 = "";
+        code = 2026285;
+        content = "";
+        date = "2026-10-26(\U4e00)";
+        detailsLink = "/c/2026/10/26/671128.shtml";
+        m2add = "";
+        msg = "";
+        name = 3D;
+        poolmoney = "";
+        prizegrades =         (
+                        {
+                type = 1;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 2;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 3;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 4;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 5;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 6;
+                typemoney = "";
+                typenum = "";
+            },
+                        {
+                type = 7;
+                typemoney = "";
+                typenum = "";
+            }
+        );
+        red = "9,3,2";
+        sales = 99355354;
+        videoLink = "";
+        week = "\U4e00";
+        z2add = "";
+    },
+        {
+        addmoney = "";
+        addmoney2 = "";
+        blue = "";
+        blue2 = "";
         code = 2026284;
         content = "";
         date = "2026-10-25(\U65e5)";
@@ -39370,62 +39426,6 @@
         sales = 113500822;
         videoLink = "";
         week = "\U4e94";
-        z2add = "";
-    },
-        {
-        addmoney = "";
-        addmoney2 = "";
-        blue = "";
-        blue2 = "";
-        code = 2024284;
-        content = "";
-        date = "2024-10-24(\U56db)";
-        detailsLink = "/c/2024/10/24/592387.shtml";
-        m2add = "";
-        msg = "";
-        name = 3D;
-        poolmoney = "";
-        prizegrades =         (
-                        {
-                type = 1;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 2;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 3;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 4;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 5;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 6;
-                typemoney = "";
-                typenum = "";
-            },
-                        {
-                type = 7;
-                typemoney = "";
-                typenum = "";
-            }
-        );
-        red = "3,4,2";
-        sales = 114097094;
-        videoLink = "";
-        week = "\U56db";
         z2add = "";
     }
 )
